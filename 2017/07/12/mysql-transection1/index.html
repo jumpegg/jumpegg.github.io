@@ -10,15 +10,12 @@
 <p>InnoDB는 쿼리 중 일부라도 오류가 발생하면 전체를 원 상태로 만들어 둔다는 트랜잭션의 원칙대로 insert 쿼리 문장을 실행하기 전 상태로 그대로 복구했다.</p>
 <p>MyISAM에서 발생하는 이런 현상을 부분 업데이트(partial update)라고 하며, 이것은 테이블 데이터의 정합성을 맞추는데 상당한 어려움을 유발시킨다.</p>
 <h3 id="4-1-2-주의사항"><a href="#4-1-2-주의사항" class="headerlink" title="4.1.2 주의사항"></a>4.1.2 주의사항</h3><p>트랜잭션 또한 DBMS의 커넥션과 동일하게 꼭 필요한 최소의 코드에만 적용하는 것이 좋다. 이는 프로그램 코드에서 트랜잭션의 범위를 최소화 하라는 의미다. 설명을 위해 간단한 예를 들어보자</p>
-<blockquote>
 <ol>
-<li>처리시작</li>
-</ol>
-<ul>
+<li>처리시작<ul>
 <li>=&gt; 데이터베이스 커넥션 생성</li>
 <li>=&gt; 트랜잭션 시작</li>
 </ul>
-<ol>
+</li>
 <li>사용자의 로그인 여부 확인</li>
 <li>사용자의 글쓰기 내용의 오류 여부 확인</li>
 <li>첨부로 업로드된 파일 확인 및 저장</li>
@@ -26,16 +23,13 @@
 <li>첨부 파일 정보를 DBMS에 저장</li>
 <li>저장된 내용 또는 기타 정보를 DBMS에서 조회</li>
 <li>게시물 등록에 대한 알림 메일 발송</li>
-<li>알림 메일 발송 이력을 DBMS에 저장</li>
-</ol>
-<ul>
+<li>알림 메일 발송 이력을 DBMS에 저장<ul>
 <li>&lt;= 트랜잭션 종료 (commit)</li>
 <li>&lt;= 데이터베이스 커넥션 반납</li>
 </ul>
-<ol>
+</li>
 <li>처리 완료</li>
 </ol>
-</blockquote>
 <p>위 처리절차 중에 DBMS의 트랜잭션 처리에 좋지 않은 영향을 끼치는 부분을 나눠서 살펴보자</p>
 <ul>
 <li>커넥션 생성을 1과 2번 사이에 구현했는데 DB의 사용은 5~9 사이에 이루어진다. DB의 커넥션은 제한적이라 커넥션 유지 부분을 짧게 작성 할 수록 좋다.</li>
@@ -43,40 +37,30 @@
 <li>위의 과정 중 5,6번 작업은 반드시 하나의 트랜잭션으로 묶어야 하며, 7번작업은 저장된 데이터의 단순 확인작업이므로 트랜잭션에 포함시킬 필요 없다. 9번작업은 이전 5,6 번 작업과 성격이 다르기 때문에 같은 트랜잭션으로 묶을 필요가 없다.</li>
 </ul>
 <p>이러한 내용을 적용시켜 재설계 해보자</p>
-<blockquote>
 <ol>
 <li>처리 시작</li>
 <li>사용자의 로그인 여부 확인</li>
 <li>사용자의 클쓰기 내용의 오류 발생 여부 확인</li>
-<li>첨부로 업로드된 파일 확인 및 저장</li>
-</ol>
-<ul>
+<li>첨부로 업로드된 파일 확인 및 저장<ul>
 <li>=&gt; 데이터베이스 커넥션 생성</li>
 <li>=&gt; 트랜잭션 시작</li>
 </ul>
-<ol>
+</li>
 <li>사용자의 입력 내용을 DBMS에 저장</li>
-<li>첨부 파일 정보를 DBMS에 저장</li>
-</ol>
-<ul>
+<li>첨부 파일 정보를 DBMS에 저장<ul>
 <li>&lt;= 트랜잭션 종료</li>
 </ul>
-<ol>
+</li>
 <li>저장된 내용 또는 기타 정보를 DBMS에서 조회</li>
-<li>게시물 등록에 대한 알림 메일 발송</li>
-</ol>
-<ul>
+<li>게시물 등록에 대한 알림 메일 발송<ul>
 <li>=&gt; 트랜잭션 시작</li>
 </ul>
-<ol>
-<li>알림 메일 발송 이력을 DBMS에 저장</li>
-</ol>
-<ul>
+</li>
+<li>알림 메일 발송 이력을 DBMS에 저장<ul>
 <li>&lt;= 트랜잭션 종료</li>
 <li>&lt;= 데이터베이스 커넥션 종료</li>
 </ul>
-<ol>
+</li>
 <li>처리 완료</li>
 </ol>
-</blockquote>
-</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="https://jumpegg.github.io/2017/07/12/mysql-transection1/" data-id="cj50kjnj8000df4uf8uttf1fd" class="article-share-link">Share</a><div class="tags"><a href="/tags/transection/">transection</a></div><div class="post-nav"><a href="/2017/07/09/Ionic-nav-guard/" class="next">Ionic Guard 구현</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> Categories</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mysql/">Mysql</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ionic2/">ionic2</a><span class="category-list-count">2</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> Tags</i></div><div class="tagcloud"><a href="/tags/ionic2-nav/" style="font-size: 15px;">ionic2 nav</a> <a href="/tags/Mysql/" style="font-size: 15px;">Mysql</a> <a href="/tags/transection/" style="font-size: 15px;">transection</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> Recent</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/07/12/mysql-transection1/">CH 4 트랜젝션(4.1)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/09/Ionic-nav-guard/">Ionic Guard 구현</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture4/">3. Mysql 아키텍처 3.7, 3.8</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture3/">3. Mysql 아키텍처 CH 3.4, CH 3.5, CH 3.6</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture2/">3. Mysql 아키텍처 CH 3.2, CH 3.3</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture/">3. Mysql 아키텍쳐 CH 3.1</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/07/ionic-nav/">Ionic 간단한 nav 개념잡기</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/06/start/">Hexo 를 시작해보자</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> Links</i></div><ul></ul><a href="http://textshare.io" title="textshare.io" target="_blank">textshare.io</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2017 <a href="/." rel="nofollow">Wonny's note.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="https://jumpegg.github.io/2017/07/12/mysql-transection1/" data-id="cj50klt690006iguff05194sd" class="article-share-link">Share</a><div class="tags"><a href="/tags/transection/">transection</a></div><div class="post-nav"><a href="/2017/07/09/Ionic-nav-guard/" class="next">Ionic Guard 구현</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> Categories</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mysql/">Mysql</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ionic2/">ionic2</a><span class="category-list-count">2</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> Tags</i></div><div class="tagcloud"><a href="/tags/Mysql/" style="font-size: 15px;">Mysql</a> <a href="/tags/ionic2-nav/" style="font-size: 15px;">ionic2 nav</a> <a href="/tags/transection/" style="font-size: 15px;">transection</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> Recent</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/07/12/mysql-transection1/">CH 4 트랜젝션(4.1)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/09/Ionic-nav-guard/">Ionic Guard 구현</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture4/">3. Mysql 아키텍처 3.7, 3.8</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture3/">3. Mysql 아키텍처 CH 3.4, CH 3.5, CH 3.6</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture2/">3. Mysql 아키텍처 CH 3.2, CH 3.3</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture/">3. Mysql 아키텍쳐 CH 3.1</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/07/ionic-nav/">Ionic 간단한 nav 개념잡기</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/06/start/">Hexo 를 시작해보자</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> Links</i></div><ul></ul><a href="http://textshare.io" title="textshare.io" target="_blank">textshare.io</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2017 <a href="/." rel="nofollow">Wonny's note.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
