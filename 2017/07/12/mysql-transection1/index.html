@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>CH 4 트랜젝션(4.1) | Wonny's note</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/6.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">CH 4 트랜젝션(4.1)</h1><a id="logo" href="/.">Wonny's note</a><p class="description"></p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> Home</i></a><a href="/archives/"><i class="fa fa-archive"> Archive</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">CH 4 트랜젝션(4.1)</h1><div class="post-meta">Jul 12, 2017<span> | </span><span class="category"><a href="/categories/Mysql/">Mysql</a></span><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> Hits</span></span></div><div class="post-content"><p>Mysql 에서 동시성에 영향을 주는 잠금(lock) 과 트랜잭션, 그리고 트랜잭션의 격리수준(isolation level) 을 살펴보겠다.</p>
+<p>잠금(lock) 과 트랜잭션은 서로 비슷한 개념 같지만 사실 잠금은 동시성을 제어하기 위한 기능이고 트랜잭션은 데이터의 정합성을 보장하기 위한 기능이다.</p>
+<h2 id="4-1-트랜잭션"><a href="#4-1-트랜잭션" class="headerlink" title="4.1 트랜잭션"></a>4.1 트랜잭션</h2><h3 id="4-1-1-Mysql에서의-트랜잭션"><a href="#4-1-1-Mysql에서의-트랜잭션" class="headerlink" title="4.1.1 Mysql에서의 트랜잭션"></a>4.1.1 Mysql에서의 트랜잭션</h3><p>트랜잭션은 하나의 논리적인 작업 셋에 하나의 쿼리가 있든 두개 이상의 쿼리가 있든 관계없이 논리적인 작업 셋 자체가 100% 적용되거나(commit을 실행했을 때) 또는 아무것도 적용되지 않아야 (RollBack 또는 Transection Rollback 시키는 오류가 발생했을 때) 함을 보장해 주는 것이다.</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">mysql&gt; create table tab_myisam (fdpk int not null, primary key(fdpk)) engine=MyISAM;</div><div class="line">mysql&gt; insert into tab_myisam (fdpk) values (3);</div><div class="line"></div><div class="line">mysql&gt; create table tab_innodb (fdpk int not null, primary key (fdpk)) engine=innoDB;</div><div class="line">mysql&gt; insert into tab_innodb (fdpk) values (3);</div></pre></td></tr></table></figure>
+<p>위와같이 테스트 테이블을 생성 후 auto-commit 모드에서 다음 쿼리 문장을 실행해 보자</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">mysql&gt; insert into tab_myisam (fdpk) values (1), (2), (3);</div><div class="line">mysql&gt; insert into tab_innodb (fdpk) values (1), (2), (3);</div></pre></td></tr></table></figure>
+<p>두 개의 스토리지 엔진에서 결과가 어떻게 다를까? 위 쿼리 문장의 테스트 결과는 다음과 같다.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line">mysql&gt; Insert into tab_myisam (fdpk) values (1), (2), (3);</div><div class="line">error 1062 ......</div><div class="line"></div><div class="line">mysql&gt; insert into tab_innodb (fdpk) values (1), (2), (3);</div><div class="line">error 1062 ...</div><div class="line"></div><div class="line">mysql&gt; select * from tab_myisam;</div><div class="line">+-------+</div><div class="line">| fdpk  |</div><div class="line">+-------+</div><div class="line">|    1  |</div><div class="line">|    2  |</div><div class="line">|    3  |</div><div class="line">+-------+</div><div class="line"></div><div class="line">mysql&gt; select * from tab_innodb;</div><div class="line">+-------+</div><div class="line">| fdpk  |</div><div class="line">+-------+</div><div class="line">|    3  |</div><div class="line">+-------+</div></pre></td></tr></table></figure>
+<p>MyISAM의 경우 오류가 발생했음에도 1,2 가 들어가 있다. MyISAM 테이블에 insert 문장이 실행되면서 차례대로 1,2를 저장하고 그 다음 3을 저장하려는 순간 중복키 오류가 발생한 것이다. </p>
+<p>InnoDB는 쿼리 중 일부라도 오류가 발생하면 전체를 원 상태로 만들어 둔다는 트랜잭션의 원칙대로 insert 쿼리 문장을 실행하기 전 상태로 그대로 복구했다.</p>
+<p>MyISAM에서 발생하는 이런 현상을 부분 업데이트(partial update)라고 하며, 이것은 테이블 데이터의 정합성을 맞추는데 상당한 어려움을 유발시킨다.</p>
+<h3 id="4-1-2-주의사항"><a href="#4-1-2-주의사항" class="headerlink" title="4.1.2 주의사항"></a>4.1.2 주의사항</h3><p>트랜잭션 또한 DBMS의 커넥션과 동일하게 꼭 필요한 최소의 코드에만 적용하는 것이 좋다. 이는 프로그램 코드에서 트랜잭션의 범위를 최소화 하라는 의미다. 설명을 위해 간단한 예를 들어보자</p>
+<blockquote>
+<ol>
+<li>처리시작</li>
+</ol>
+<ul>
+<li>=&gt; 데이터베이스 커넥션 생성</li>
+<li>=&gt; 트랜잭션 시작</li>
+</ul>
+<ol>
+<li>사용자의 로그인 여부 확인</li>
+<li>사용자의 글쓰기 내용의 오류 여부 확인</li>
+<li>첨부로 업로드된 파일 확인 및 저장</li>
+<li>사용자의 입력 내용을 DBMS에 저장</li>
+<li>첨부 파일 정보를 DBMS에 저장</li>
+<li>저장된 내용 또는 기타 정보를 DBMS에서 조회</li>
+<li>게시물 등록에 대한 알림 메일 발송</li>
+<li>알림 메일 발송 이력을 DBMS에 저장</li>
+</ol>
+<ul>
+<li>&lt;= 트랜잭션 종료 (commit)</li>
+<li>&lt;= 데이터베이스 커넥션 반납</li>
+</ul>
+<ol>
+<li>처리 완료</li>
+</ol>
+</blockquote>
+<p>위 처리절차 중에 DBMS의 트랜잭션 처리에 좋지 않은 영향을 끼치는 부분을 나눠서 살펴보자</p>
+<ul>
+<li>커넥션 생성을 1과 2번 사이에 구현했는데 DB의 사용은 5~9 사이에 이루어진다. DB의 커넥션은 제한적이라 커넥션 유지 부분을 짧게 작성 할 수록 좋다.</li>
+<li>8번의 메일전송이나 FTP 파일 전송작업 또는 네트워크를 통해 원격 서버와 통신하는 등과 같은 작업은 어떻게든 <strong>트랜잭션</strong> 내에서 제거하는 것이 좋다. 프로그램 실행 중에 메일서버와 통신할 수 없는 상황이 발생한다면 웹 서버뿐 아니라 DBMS 서버까지 위험해지는 상황이 발생 할 것이다.</li>
+<li>위의 과정 중 5,6번 작업은 반드시 하나의 트랜잭션으로 묶어야 하며, 7번작업은 저장된 데이터의 단순 확인작업이므로 트랜잭션에 포함시킬 필요 없다. 9번작업은 이전 5,6 번 작업과 성격이 다르기 때문에 같은 트랜잭션으로 묶을 필요가 없다.</li>
+</ul>
+<p>이러한 내용을 적용시켜 재설계 해보자</p>
+<blockquote>
+<ol>
+<li>처리 시작</li>
+<li>사용자의 로그인 여부 확인</li>
+<li>사용자의 클쓰기 내용의 오류 발생 여부 확인</li>
+<li>첨부로 업로드된 파일 확인 및 저장</li>
+</ol>
+<ul>
+<li>=&gt; 데이터베이스 커넥션 생성</li>
+<li>=&gt; 트랜잭션 시작</li>
+</ul>
+<ol>
+<li>사용자의 입력 내용을 DBMS에 저장</li>
+<li>첨부 파일 정보를 DBMS에 저장</li>
+</ol>
+<ul>
+<li>&lt;= 트랜잭션 종료</li>
+</ul>
+<ol>
+<li>저장된 내용 또는 기타 정보를 DBMS에서 조회</li>
+<li>게시물 등록에 대한 알림 메일 발송</li>
+</ol>
+<ul>
+<li>=&gt; 트랜잭션 시작</li>
+</ul>
+<ol>
+<li>알림 메일 발송 이력을 DBMS에 저장</li>
+</ol>
+<ul>
+<li>&lt;= 트랜잭션 종료</li>
+<li>&lt;= 데이터베이스 커넥션 종료</li>
+</ul>
+<ol>
+<li>처리 완료</li>
+</ol>
+</blockquote>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="https://jumpegg.github.io/2017/07/12/mysql-transection1/" data-id="cj50kjnj8000df4uf8uttf1fd" class="article-share-link">Share</a><div class="tags"><a href="/tags/transection/">transection</a></div><div class="post-nav"><a href="/2017/07/09/Ionic-nav-guard/" class="next">Ionic Guard 구현</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> Categories</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mysql/">Mysql</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ionic2/">ionic2</a><span class="category-list-count">2</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> Tags</i></div><div class="tagcloud"><a href="/tags/ionic2-nav/" style="font-size: 15px;">ionic2 nav</a> <a href="/tags/Mysql/" style="font-size: 15px;">Mysql</a> <a href="/tags/transection/" style="font-size: 15px;">transection</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> Recent</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/07/12/mysql-transection1/">CH 4 트랜젝션(4.1)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/09/Ionic-nav-guard/">Ionic Guard 구현</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture4/">3. Mysql 아키텍처 3.7, 3.8</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture3/">3. Mysql 아키텍처 CH 3.4, CH 3.5, CH 3.6</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture2/">3. Mysql 아키텍처 CH 3.2, CH 3.3</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture/">3. Mysql 아키텍쳐 CH 3.1</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/07/ionic-nav/">Ionic 간단한 nav 개념잡기</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/06/start/">Hexo 를 시작해보자</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> Links</i></div><ul></ul><a href="http://textshare.io" title="textshare.io" target="_blank">textshare.io</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2017 <a href="/." rel="nofollow">Wonny's note.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
