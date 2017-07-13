@@ -5,7 +5,7 @@
   <link href="/feed.xml" rel="self"/>
   
   <link href="https://jumpegg.github.io/"/>
-  <updated>2017-07-12T07:13:44.519Z</updated>
+  <updated>2017-07-13T09:39:25.897Z</updated>
   <id>https://jumpegg.github.io/</id>
   
   <author>
@@ -14,6 +14,64 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>ionic root nav 문제해결</title>
+    <link href="https://jumpegg.github.io/2017/07/13/ionic-problem-01/"/>
+    <id>https://jumpegg.github.io/2017/07/13/ionic-problem-01/</id>
+    <published>2017-07-13T09:09:16.000Z</published>
+    <updated>2017-07-13T09:39:25.897Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="Ionic-root-문제"><a href="#Ionic-root-문제" class="headerlink" title="Ionic root 문제"></a>Ionic root 문제</h3><p>ionic을 사용하다 보면 페이지 컨트롤을 위해서 자연적으로 NavController를 사용하게 되는데, 정확히 파악하지 않은 상태에서 NavCtrl을 사용하다 보니 내가 생각했던 구조대로 앱이 만들어지지 않고 있다는 것을 깨닫게 되었다.</p>
+<h4 id="문제점"><a href="#문제점" class="headerlink" title="문제점"></a>문제점</h4><p>우선 내가 의도한 구조는 이렇다<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">app&lt;Nav&gt;&#123;</div><div class="line">	LoginPage,</div><div class="line">	UserPage&lt;Nav&gt;:[</div><div class="line">		page1,</div><div class="line">		page2,</div><div class="line">		page3,</div><div class="line">		.....</div><div class="line">	],</div><div class="line">	StudyPage&lt;Nav&gt;:[</div><div class="line">		page1,</div><div class="line">		page2,</div><div class="line">		page3,</div><div class="line">		.....</div><div class="line">	],</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>하지만 내가 만든 구조는 이렇게 되어있었다.<br><figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">app&lt;Nav&gt;&#123;</div><div class="line">	LoginPage,</div><div class="line">	UserPage&lt;Nav&gt;:[</div><div class="line">		page1,</div><div class="line">		page2,</div><div class="line">		page3,</div><div class="line">		.....</div><div class="line">		StudyPage&lt;Nav&gt;:[</div><div class="line">			page1,</div><div class="line">			page2,</div><div class="line">			page3,</div><div class="line">			.....</div><div class="line">		]</div><div class="line">	]</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>상황이 심각하다.</p>
+<h4 id="문제인식"><a href="#문제인식" class="headerlink" title="문제인식"></a>문제인식</h4><p>구조가 잘못되고 있다는것을 인식한 것은 UserPage에서 생성한 css 가 StudyPage에 영향을 미치고 있는걸 보고 알게 되었다. 기본적으로 ionic은 각 페이지 별로 css 정의를 할 수 있고, 자식 컴포넌트가 아니면 css간 영향이 없다.</p>
+<h4 id="원인"><a href="#원인" class="headerlink" title="원인"></a>원인</h4><p>공식 홈페이지나 구글링을 통해 얻을 수 있는 Tutorial 을 따라하다 보면 navCtrl.push(), navCtrl.pop(), navCtrl.setRoot() 에 관한 설명은 잘 되어있으나 그 이상은 설명되어 있지 않으며 여기서 필자의 경우엔 setRoot() 의 작동방식을 착각한 것이 원인이었다.</p>
+<h4 id="해결"><a href="#해결" class="headerlink" title="해결"></a>해결</h4><p>여기 저기에서 사용한 setRoot()는 해당 컴포넌트에 ion-nav 를 사용하지 않으면 부모 컴포넌트의 ion-nav 를 바꿔주었지만, 컴포넌트에 ion-nav 가 있는 경우 해당 컴포넌트의 ion-nav를 바꿔준다. 그래서 최상단의 navCtrl을 가져오기 위해선 App을 가져와야 한다.</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> &#123; App, NavCtroller, NavParams&#125; <span class="keyword">from</span> <span class="string">'ionic-angular'</span>;</div><div class="line">....</div><div class="line"></div><div class="line"><span class="meta">@Component</span>(&#123;</div><div class="line">	selector: <span class="string">'your-selector'</span>,</div><div class="line">	templateUrl: <span class="string">'your-template.html'</span></div><div class="line">&#125;)</div><div class="line"><span class="keyword">export</span> <span class="keyword">class</span> YourPage&#123;</div><div class="line">	<span class="keyword">constructor</span>(<span class="params"></span></div><div class="line">		<span class="keyword">public</span> navCtrl: NavController,</div><div class="line">		<span class="keyword">public</span> navParams: NavParams,</div><div class="line">		<span class="keyword">public</span> appCtrl: App</div><div class="line">	)&#123;&#125;</div><div class="line">	...........</div><div class="line">	moveToPage()&#123;</div><div class="line">		<span class="comment">// getRootNav()는 최상단의 nav를 가져온다.</span></div><div class="line">		<span class="keyword">this</span>.appCtrl.getRootNav().setRoot(NextPage);</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="출처"><a href="#출처" class="headerlink" title="출처"></a>출처</h4><p><a href="https://stackoverflow.com/questions/38879674/how-to-access-parent-navcontroller-ionic-2" target="_blank" rel="external">stack overflow</a></p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;Ionic-root-문제&quot;&gt;&lt;a href=&quot;#Ionic-root-문제&quot; class=&quot;headerlink&quot; title=&quot;Ionic root 문제&quot;&gt;&lt;/a&gt;Ionic root 문제&lt;/h3&gt;&lt;p&gt;ionic을 사용하다 보면 페이지 컨트롤을 위해
+    
+    </summary>
+    
+      <category term="문제해결" scheme="https://jumpegg.github.io/categories/%EB%AC%B8%EC%A0%9C%ED%95%B4%EA%B2%B0/"/>
+    
+    
+      <category term="ionic-root" scheme="https://jumpegg.github.io/tags/ionic-root/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>ionic-menu</title>
+    <link href="https://jumpegg.github.io/2017/07/12/ionic-menu/"/>
+    <id>https://jumpegg.github.io/2017/07/12/ionic-menu/</id>
+    <published>2017-07-12T08:59:02.000Z</published>
+    <updated>2017-07-12T09:12:08.989Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="IONIC-Menu-사용법"><a href="#IONIC-Menu-사용법" class="headerlink" title="IONIC Menu 사용법"></a>IONIC Menu 사용법</h2><h3 id="ionic-menu-사용"><a href="#ionic-menu-사용" class="headerlink" title="ionic menu 사용"></a>ionic menu 사용</h3><p>ion-menu 는 사이드 메뉴를 만드는데 사용된다.<br><figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 템플릿 사이드 코드 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">ion-menu</span> [<span class="attr">content</span>]=<span class="string">"mycontent"</span>&gt;</span></div><div class="line">  <span class="tag">&lt;<span class="name">ion-content</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">ion-list</span>&gt;</span></div><div class="line">      <span class="tag">&lt;<span class="name">p</span>&gt;</span>some menu content, could be list items<span class="tag">&lt;/<span class="name">p</span>&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">ion-list</span>&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">ion-content</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">ion-menu</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">ion-nav</span> #<span class="attr">mycontent</span> [<span class="attr">root</span>]=<span class="string">"rootPage"</span>&gt;</span><span class="tag">&lt;/<span class="name">ion-nav</span>&gt;</span></div></pre></td></tr></table></figure></p>
+<ul>
+<li>사이드 메뉴를 열 수 있는 버튼 생성<figure class="highlight html"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">button</span> <span class="attr">menuToggle</span>&gt;</span></div><div class="line">	<span class="tag">&lt;<span class="name">ion-icon</span> <span class="attr">name</span>=<span class="string">"menu"</span>&gt;</span><span class="tag">&lt;/<span class="name">ion-icon</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">button</span>&gt;</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> &#123; Component &#125; <span class="keyword">from</span> <span class="string">'@angular/core'</span>;</div><div class="line"><span class="keyword">import</span> &#123; MenuController &#125; <span class="keyword">from</span> <span class="string">'ionic-angular'</span>;</div><div class="line"></div><div class="line"><span class="meta">@Component</span>(&#123;...&#125;)</div><div class="line"><span class="keyword">export</span> <span class="keyword">class</span> MyPage &#123;</div><div class="line"></div><div class="line"> <span class="keyword">constructor</span>(<span class="params"><span class="keyword">public</span> menuCtrl: MenuController</span>) &#123;</div><div class="line"></div><div class="line"> &#125;</div><div class="line"></div><div class="line"> openMenu() &#123;</div><div class="line">   <span class="keyword">this</span>.menuCtrl.open();</div><div class="line"> &#125;</div><div class="line"></div><div class="line"> closeMenu() &#123;</div><div class="line">   <span class="keyword">this</span>.menuCtrl.close();</div><div class="line"> &#125;</div><div class="line"></div><div class="line"> toggleMenu() &#123;</div><div class="line">   <span class="keyword">this</span>.menuCtrl.toggle();</div><div class="line"> &#125;</div><div class="line"></div><div class="line">&#125;</div></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;IONIC-Menu-사용법&quot;&gt;&lt;a href=&quot;#IONIC-Menu-사용법&quot; class=&quot;headerlink&quot; title=&quot;IONIC Menu 사용법&quot;&gt;&lt;/a&gt;IONIC Menu 사용법&lt;/h2&gt;&lt;h3 id=&quot;ionic-menu-사용&quot;&gt;&lt;a
+    
+    </summary>
+    
+      <category term="ionic2" scheme="https://jumpegg.github.io/categories/ionic2/"/>
+    
+    
+      <category term="ionic2-menu" scheme="https://jumpegg.github.io/tags/ionic2-menu/"/>
+    
+  </entry>
   
   <entry>
     <title>CH 4 트랜잭션(4.2)</title>
@@ -152,7 +210,7 @@
     <link href="https://jumpegg.github.io/2017/07/09/Ionic-nav-guard/"/>
     <id>https://jumpegg.github.io/2017/07/09/Ionic-nav-guard/</id>
     <published>2017-07-09T05:23:41.000Z</published>
-    <updated>2017-07-09T05:38:49.588Z</updated>
+    <updated>2017-07-12T08:59:34.949Z</updated>
     
     <content type="html"><![CDATA[<h2 id="Lifecyle-을-이용한-구현"><a href="#Lifecyle-을-이용한-구현" class="headerlink" title="Lifecyle 을 이용한 구현"></a>Lifecyle 을 이용한 구현</h2><p>Angular 에서는 route 부분에서 guard를 구현해 해당 페이지에 접근가능/불가 를 제어한다. ionic에서는 해당 기능을 lifecycle을 통해 제공하고 있다.</p>
 <h3 id="ionViewCanEnter-ionViewCanLeave"><a href="#ionViewCanEnter-ionViewCanLeave" class="headerlink" title="ionViewCanEnter / ionViewCanLeave"></a>ionViewCanEnter / ionViewCanLeave</h3><p>NavController에 ionViewCanEnter 와 ionViewCanLeave 는 페이지의 접근 관련제어를 담당하고 있다.</p>
@@ -176,7 +234,7 @@
       <category term="ionic2" scheme="https://jumpegg.github.io/categories/ionic2/"/>
     
     
-      <category term="ionic2 nav" scheme="https://jumpegg.github.io/tags/ionic2-nav/"/>
+      <category term="ionic2-nav" scheme="https://jumpegg.github.io/tags/ionic2-nav/"/>
     
   </entry>
   
@@ -394,7 +452,7 @@
     <link href="https://jumpegg.github.io/2017/07/07/ionic-nav/"/>
     <id>https://jumpegg.github.io/2017/07/07/ionic-nav/</id>
     <published>2017-07-07T14:37:10.000Z</published>
-    <updated>2017-07-09T05:48:34.603Z</updated>
+    <updated>2017-07-12T08:59:28.348Z</updated>
     
     <content type="html"><![CDATA[<h2 id="IONIC-간단한-nav-개념잡기"><a href="#IONIC-간단한-nav-개념잡기" class="headerlink" title="IONIC 간단한 nav 개념잡기"></a>IONIC 간단한 nav 개념잡기</h2><h3 id="기본적인-페이지-이동"><a href="#기본적인-페이지-이동" class="headerlink" title="기본적인 페이지 이동"></a>기본적인 페이지 이동</h3><p>ionic 은 router 의 개념이 stack을 통해 view 를 push/pop 하는 형식이다.(이것은 한글인가 영어인가….)</p>
 <figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> &#123;NavController&#125; <span class="keyword">from</span> <span class="string">'ionic-angular'</span>;</div><div class="line">.....</div><div class="line"></div><div class="line"><span class="meta">@Component</span>(&#123;</div><div class="line">	templateUrl: <span class="string">'yourIndex.html'</span>;</div><div class="line">&#125;)</div><div class="line"><span class="keyword">export</span> <span class="keyword">class</span> IndexPage&#123;</div><div class="line">	<span class="keyword">constructor</span>(<span class="params"></span></div><div class="line">		<span class="keyword">public</span> navCtrl:NavController)&#123;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
@@ -424,7 +482,7 @@
       <category term="ionic2" scheme="https://jumpegg.github.io/categories/ionic2/"/>
     
     
-      <category term="ionic2 nav" scheme="https://jumpegg.github.io/tags/ionic2-nav/"/>
+      <category term="ionic2-nav" scheme="https://jumpegg.github.io/tags/ionic2-nav/"/>
     
   </entry>
   

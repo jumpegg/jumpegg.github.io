@@ -7,6 +7,38 @@
     </url>
 
     <url>
+        <loc>https://jumpegg.github.io/2017/07/13/ionic-problem-01/</loc>
+        <lastmod>2017-07-13T09:39:25.897Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://jumpegg.github.io/2017/07/12/ionic-menu/</loc>
+        <lastmod>2017-07-12T09:12:08.989Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://jumpegg.github.io/2017/07/09/Ionic-nav-guard/</loc>
+        <lastmod>2017-07-12T08:59:34.949Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://jumpegg.github.io/2017/07/07/ionic-nav/</loc>
+        <lastmod>2017-07-12T08:59:28.348Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://jumpegg.github.io/2017/07/12/mysql-transection2/</loc>
         <lastmod>2017-07-12T07:13:44.519Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -49,22 +81,6 @@
     <url>
         <loc>https://jumpegg.github.io/2017/07/12/mysql-transection1/</loc>
         <lastmod>2017-07-12T05:33:51.470Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://jumpegg.github.io/2017/07/07/ionic-nav/</loc>
-        <lastmod>2017-07-09T05:48:34.603Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://jumpegg.github.io/2017/07/09/Ionic-nav-guard/</loc>
-        <lastmod>2017-07-09T05:38:49.588Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
