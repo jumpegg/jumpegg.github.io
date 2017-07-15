@@ -5,7 +5,7 @@
   <link href="/feed.xml" rel="self"/>
   
   <link href="https://jumpegg.github.io/"/>
-  <updated>2017-07-15T03:34:10.078Z</updated>
+  <updated>2017-07-15T03:53:36.968Z</updated>
   <id>https://jumpegg.github.io/</id>
   
   <author>
@@ -16,11 +16,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>CH 4 트랜잭션(4.4)</title>
+    <title>CH 4 트랜잭션(4.4, 4.5)</title>
     <link href="https://jumpegg.github.io/2017/07/15/mysql-transection3/"/>
     <id>https://jumpegg.github.io/2017/07/15/mysql-transection3/</id>
     <published>2017-07-15T01:29:33.000Z</published>
-    <updated>2017-07-15T03:34:10.078Z</updated>
+    <updated>2017-07-15T03:53:36.968Z</updated>
     
     <content type="html"><![CDATA[<h2 id="4-4-InnoDB-스토리지-엔진의-잠금"><a href="#4-4-InnoDB-스토리지-엔진의-잠금" class="headerlink" title="4.4 InnoDB 스토리지 엔진의 잠금"></a>4.4 InnoDB 스토리지 엔진의 잠금</h2><p>InnoDb 스토리지 엔진은 MYSQL에서 제공하는 잠금과는 별개로 스토리지 엔진 내부에서 레코드 기반의 잠금 방식을 탑재하고 있다. InnoDB는 레코드 기반의 잠금 방식 때문에 MyISAM보다는 훨씬 뛰어난 동시성 처리를 제공할 수 있다.</p>
 <h3 id="4-4-1-InnoDB의-잠금-방식"><a href="#4-4-1-InnoDB의-잠금-방식" class="headerlink" title="4.4.1 InnoDB의 잠금 방식"></a>4.4.1 InnoDB의 잠금 방식</h3><ul>
@@ -98,7 +98,8 @@
 </tr>
 </tbody>
 </table>
-<h3 id="4-5-1-READ-UNCOMMITTED"><a href="#4-5-1-READ-UNCOMMITTED" class="headerlink" title="4.5.1 READ UNCOMMITTED"></a>4.5.1 READ UNCOMMITTED</h3><p>READ UNCOMMITTED 격리 수준에서는 각 트랜잭션에서의 변경 내용이 COMMIT이나 ROLLBACK 여부에 상관 없이 다른 트랜잭션에서 보여진다.</p>
+<h3 id="4-5-1-READ-UNCOMMITTED"><a href="#4-5-1-READ-UNCOMMITTED" class="headerlink" title="4.5.1 READ UNCOMMITTED"></a>4.5.1 READ UNCOMMITTED</h3><p>READ UNCOMMITTED 격리 수준에서는 각 트랜잭션에서의 변경 내용이 COMMIT이나 ROLLBACK 여부에 상관 없이 다른 트랜잭션에서 보여진다. 이때 다른 트랜잭션에는 변경된 레코드가 반영되지 않는 현상을 Dirty read 라고 한다. Dirty read는 사용자와 개발자를 혼란스럽게 한다.</p>
+<h3 id="4-5-2-READ-COMMITTED"><a href="#4-5-2-READ-COMMITTED" class="headerlink" title="4.5.2 READ COMMITTED"></a>4.5.2 READ COMMITTED</h3><p>READ COMMITTED는 오라클 DBMS에서 기본적으로 사용되는 격리 수준이며, 온라인 서비스에서 가장 많이 선택되는 격리 수준이다. Dirty read 같은 현상은 발생하지 않는다. 어떤 트랜잭션에서 데이터를 변경했더라도 Commit이 완료된 데이터만 다른 트랜잭션에서 조회할 수 있기 때문이다.</p>
 ]]></content>
     
     <summary type="html">
