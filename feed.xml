@@ -5,7 +5,7 @@
   <link href="/feed.xml" rel="self"/>
   
   <link href="https://jumpegg.github.io/"/>
-  <updated>2017-07-13T09:39:25.897Z</updated>
+  <updated>2017-07-15T03:34:10.078Z</updated>
   <id>https://jumpegg.github.io/</id>
   
   <author>
@@ -14,6 +14,105 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>CH 4 트랜잭션(4.4)</title>
+    <link href="https://jumpegg.github.io/2017/07/15/mysql-transection3/"/>
+    <id>https://jumpegg.github.io/2017/07/15/mysql-transection3/</id>
+    <published>2017-07-15T01:29:33.000Z</published>
+    <updated>2017-07-15T03:34:10.078Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="4-4-InnoDB-스토리지-엔진의-잠금"><a href="#4-4-InnoDB-스토리지-엔진의-잠금" class="headerlink" title="4.4 InnoDB 스토리지 엔진의 잠금"></a>4.4 InnoDB 스토리지 엔진의 잠금</h2><p>InnoDb 스토리지 엔진은 MYSQL에서 제공하는 잠금과는 별개로 스토리지 엔진 내부에서 레코드 기반의 잠금 방식을 탑재하고 있다. InnoDB는 레코드 기반의 잠금 방식 때문에 MyISAM보다는 훨씬 뛰어난 동시성 처리를 제공할 수 있다.</p>
+<h3 id="4-4-1-InnoDB의-잠금-방식"><a href="#4-4-1-InnoDB의-잠금-방식" class="headerlink" title="4.4.1 InnoDB의 잠금 방식"></a>4.4.1 InnoDB의 잠금 방식</h3><ul>
+<li><p>비관적 잠금<br>현재 트랜잭션에서 변경하고자 하는 레코드에 대해 잠금을 획득하고 변경 작업을 처리하는 방식</p>
+</li>
+<li><p>낙관적 잠금</p>
+</li>
+</ul>
+<p>낙관적 잠금에서는 기본적으로 각 트랜잭션이 같은 레코드를 변경할 가능성은 상당히 희박할 것이라고 가정한다. 그래서 우선 변경 작업을 수행하고 마지막에 잠금 충돌이 있었는지 확인해 문제가 있었다면 ROLLBACK처리 하는 방식을 의미한다.</p>
+<h3 id="4-4-2-InnoDB의-잠금의-종류"><a href="#4-4-2-InnoDB의-잠금의-종류" class="headerlink" title="4.4.2 InnoDB의 잠금의 종류"></a>4.4.2 InnoDB의 잠금의 종류</h3><ul>
+<li>레코드 락(Record lock, Record only lock)</li>
+</ul>
+<p>레코드 자체만을 잠그는 것을 레코드 락 이라고 하며, 다른 상용 DBMS의 레코드 락과 동일한 역할을 한다. 한가지 중요한 차이는 InnoDB 스토리지 엔진은 레코드 자체가 아니라 인덱스의 레코드를 잠근다는 점이다. 만약 인덱스가 하나도 없는 테이블이라 하더라도 내부적으로 자동 생성된 클러스터 인덱스를 이용해 잠금을 설정한다.</p>
+<ul>
+<li>갭 락(Gap lock)</li>
+</ul>
+<p>다른 DBMS와의 또 다른 차이는 바로 갭 락이다. 갭 락은 레코드 그 자체가 아니라 레코드와 바로 인접한 레코드 사이의 간격만을 잠그는 것을 의미한다. 갭 락의 역할은 레코드와 레코드 사이에 새로운 레코드가 생성되는 것을 제어하는 것이다.</p>
+<ul>
+<li>넥스트 키 락(Next key lock)</li>
+</ul>
+<p>레코드 락과 갭 락을 합쳐 놓은 형태의 잠금을 넥스트 키 락이라고 한다. </p>
+<ul>
+<li>자동 증가 락(Auto increment lock)</li>
+</ul>
+<p>Auto_increment 칼럼이 사용된 테이블에 동시에 여러 레코드가 insert 되는 경우, 저장되는 각 레고드는 중복되지 않고 저장된 순서대로 증가한 일련번호 값을 가져야 한다. InnoDB 스토리지 엔진에서는 이를 위해 내부적으로 Auto_increment 락이라고 하는 테이블의 수준의 잠금을 사용한다.</p>
+<h3 id="4-4-3-인덱스와-잠금"><a href="#4-4-3-인덱스와-잠금" class="headerlink" title="4.4.3 인덱스와 잠금"></a>4.4.3 인덱스와 잠금</h3><p>InnoDB의 잠금과 인덱스는 상당히 중요한 연관 관계가 있다. 레코드 락은 레코드의 인덱스를 잠그는 방식으로 처리된다. 즉, 변경해야 할 레코드를 찾기 위해 검색한 인덱스의 레코드를 모두 잠가야 한다.</p>
+<p>하나의 테이블에 update 문장이 실행되면 Mysql의 InnoDB는 인덱스로 사용된 컬럼의 값과 동일한 레코드 들에 락을 건다. 만약 인덱스가 없다면 해당 테이블의 레코드에 모두 락을 건다.</p>
+<h3 id="4-4-4-트랜잭션-격리-수준과-잠금"><a href="#4-4-4-트랜잭션-격리-수준과-잠금" class="headerlink" title="4.4.4 트랜잭션 격리 수준과 잠금"></a>4.4.4 트랜잭션 격리 수준과 잠금</h3><p>이러한 불필요한 레코드의 잠금 현상은 InnoDB의 넥스트 키 락 때문에 발생하는 것이다. 하지만 InnoDB에서 넥스트 키 락을 필요하게 만드는 주 원인은 바로 복제를 위한 바이너리 로그 때문이다. 레코드 기반의 바이너리 로그를 사용하거나 바이너리 로그를 사용하지 않는 경우에는 InnoDB의 갭 락이나 넥스트 키 락의 사용을 대폭 줄일 수 있다.</p>
+<ul>
+<li><p>Mysql 5.0<br>innodb_locks_unsafe_for_binlog = 1<br><br>트랜잭션 격리수준을 READ-COMMIT 로 설정</p>
+</li>
+<li><p>Mysql 5.1 이상</p>
+</li>
+</ul>
+<ol>
+<li>바이너리 로그를 비활성화</li>
+<li>레코드 기반의 바이너리 로그 사용 : innodb_locks_unsafe_for_binlog = 1</li>
+</ol>
+<h3 id="4-4-5-레코드-수준의-잠금-확인-및-해제"><a href="#4-4-5-레코드-수준의-잠금-확인-및-해제" class="headerlink" title="4.4.5 레코드 수준의 잠금 확인 및 해제"></a>4.4.5 레코드 수준의 잠금 확인 및 해제</h3><p>InnoDB 스토리지 엔진을 사용하는 테이블의 레코드 수준 잠금은 테이블 수준의 잠금보다는 복잡하다.<br>(복잡해서 요약이 안됨)</p>
+<h2 id="4-5-Mysql의-격리-수준"><a href="#4-5-Mysql의-격리-수준" class="headerlink" title="4.5 Mysql의 격리 수준"></a>4.5 Mysql의 격리 수준</h2><p>트랜잭션의 격리 수준이란 동시에 여러 트랜잭션이 처리될 때, 득정 트랜잭션이 다른 트랜잭션에서 변경하거나 조회하는 데이터를 볼 수 있도록 허용할지 말지를 결정하는 것이다. 격리 수준은 크게 READ UNCOMMITED, READ COMMITED, REPEATABLE READ, SERIALIZABLE 의 4가지로 나뉜다.</p>
+<p>데이터베이스의 격리수준을 이야기 하면 항상 언급되는 것은 부정합이다. 3가지 부정합 문제가 있으며 각각의 격리수준에 따른 부정합 문제는 다음과 같다.</p>
+<table>
+<thead>
+<tr>
+<th>격리수준</th>
+<th>DIRTY READ</th>
+<th>NON-REPEATABLE READ</th>
+<th>PHANTOM READ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>READ UNCOMMITTED</td>
+<td>발생</td>
+<td>발생</td>
+<td>발생</td>
+</tr>
+<tr>
+<td>READ COMMITTED</td>
+<td>발생하지 않음</td>
+<td>발생</td>
+<td>발생</td>
+</tr>
+<tr>
+<td>REPEATABLE READ</td>
+<td>발생하지 않음</td>
+<td>발생하지 않음</td>
+<td>발생(InnoDB는 발생하지 않음)</td>
+</tr>
+<tr>
+<td>SERIALIZABLE</td>
+<td>발생하지 않음</td>
+<td>발생하지 않음</td>
+<td>발생하지 않음</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4-5-1-READ-UNCOMMITTED"><a href="#4-5-1-READ-UNCOMMITTED" class="headerlink" title="4.5.1 READ UNCOMMITTED"></a>4.5.1 READ UNCOMMITTED</h3><p>READ UNCOMMITTED 격리 수준에서는 각 트랜잭션에서의 변경 내용이 COMMIT이나 ROLLBACK 여부에 상관 없이 다른 트랜잭션에서 보여진다.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;4-4-InnoDB-스토리지-엔진의-잠금&quot;&gt;&lt;a href=&quot;#4-4-InnoDB-스토리지-엔진의-잠금&quot; class=&quot;headerlink&quot; title=&quot;4.4 InnoDB 스토리지 엔진의 잠금&quot;&gt;&lt;/a&gt;4.4 InnoDB 스토리지 엔진의 
+    
+    </summary>
+    
+      <category term="Mysql" scheme="https://jumpegg.github.io/categories/Mysql/"/>
+    
+    
+      <category term="transection" scheme="https://jumpegg.github.io/tags/transection/"/>
+    
+  </entry>
   
   <entry>
     <title>ionic root nav 문제해결</title>
@@ -74,11 +173,11 @@
   </entry>
   
   <entry>
-    <title>CH 4 트랜잭션(4.2)</title>
+    <title>CH 4 트랜잭션(4.2, 4.3)</title>
     <link href="https://jumpegg.github.io/2017/07/12/mysql-transection2/"/>
     <id>https://jumpegg.github.io/2017/07/12/mysql-transection2/</id>
     <published>2017-07-12T05:45:19.000Z</published>
-    <updated>2017-07-12T07:13:44.519Z</updated>
+    <updated>2017-07-15T01:30:21.615Z</updated>
     
     <content type="html"><![CDATA[<h2 id="4-2-Mysql-엔진의-잠금"><a href="#4-2-Mysql-엔진의-잠금" class="headerlink" title="4.2 Mysql 엔진의 잠금"></a>4.2 Mysql 엔진의 잠금</h2><p>Mysql 에서 사용되는 잠금은 크게 스토리지 엔진 레벨과 Mysql 엔진 레벨로 나눠볼 수 있다. Mysql 엔진은 Mysql 서버에서 스토리지 엔진을 제외한 나머지 부분으로 이해하면 되는데, Mysql 엔진 레벨의 잠금은 모든 스토리지 엔진에 영향을 미치게 되지만 스토리지 엔진 레벨의 잠금은 스토리지 엔진 간 상호 영향을 미치지 않는다.</p>
 <h3 id="4-2-1-글로벌-락-Global-Lock"><a href="#4-2-1-글로벌-락-Global-Lock" class="headerlink" title="4.2.1 글로벌 락 (Global Lock)"></a>4.2.1 글로벌 락 (Global Lock)</h3><p>글로벌락은 “flush tables with read lock” 명령으로만 획득할 수 있으며, Mysql에서 제공하는 잠금 가운데 가장 범위가 크다. 글로벌 락이 영향을 미치는 범위는 Mysql 서버 전체이며, 작업 대상 테이블이나 데이터베이스가 다르다 하더라도 동일하게 영향을 미친다.</p>

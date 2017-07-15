@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="en"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description"><title>CH 4 트랜잭션(4.4) | Wonny's note</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/normalize/6.0.0/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/pure-min.css"><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/pure/0.6.2/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/feed.xml"><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+ga('create','UA-102438172-1','auto');ga('send','pageview');</script></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">CH 4 트랜잭션(4.4)</h1><a id="logo" href="/.">Wonny's note</a><p class="description"></p></div><div id="nav-menu"><a href="/." class="current"><i class="fa fa-home"> Home</i></a><a href="/archives/"><i class="fa fa-archive"> Archive</i></a></div></div><div id="layout" class="pure-g"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">CH 4 트랜잭션(4.4)</h1><div class="post-meta">Jul 15, 2017<span> | </span><span class="category"><a href="/categories/Mysql/">Mysql</a></span><script src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js" async></script><span id="busuanzi_container_page_pv"> | <span id="busuanzi_value_page_pv"></span><span> Hits</span></span></div><div class="post-content"><h2 id="4-4-InnoDB-스토리지-엔진의-잠금"><a href="#4-4-InnoDB-스토리지-엔진의-잠금" class="headerlink" title="4.4 InnoDB 스토리지 엔진의 잠금"></a>4.4 InnoDB 스토리지 엔진의 잠금</h2><p>InnoDb 스토리지 엔진은 MYSQL에서 제공하는 잠금과는 별개로 스토리지 엔진 내부에서 레코드 기반의 잠금 방식을 탑재하고 있다. InnoDB는 레코드 기반의 잠금 방식 때문에 MyISAM보다는 훨씬 뛰어난 동시성 처리를 제공할 수 있다.</p>
+<h3 id="4-4-1-InnoDB의-잠금-방식"><a href="#4-4-1-InnoDB의-잠금-방식" class="headerlink" title="4.4.1 InnoDB의 잠금 방식"></a>4.4.1 InnoDB의 잠금 방식</h3><ul>
+<li><p>비관적 잠금<br>현재 트랜잭션에서 변경하고자 하는 레코드에 대해 잠금을 획득하고 변경 작업을 처리하는 방식</p>
+</li>
+<li><p>낙관적 잠금</p>
+</li>
+</ul>
+<p>낙관적 잠금에서는 기본적으로 각 트랜잭션이 같은 레코드를 변경할 가능성은 상당히 희박할 것이라고 가정한다. 그래서 우선 변경 작업을 수행하고 마지막에 잠금 충돌이 있었는지 확인해 문제가 있었다면 ROLLBACK처리 하는 방식을 의미한다.</p>
+<h3 id="4-4-2-InnoDB의-잠금의-종류"><a href="#4-4-2-InnoDB의-잠금의-종류" class="headerlink" title="4.4.2 InnoDB의 잠금의 종류"></a>4.4.2 InnoDB의 잠금의 종류</h3><ul>
+<li>레코드 락(Record lock, Record only lock)</li>
+</ul>
+<p>레코드 자체만을 잠그는 것을 레코드 락 이라고 하며, 다른 상용 DBMS의 레코드 락과 동일한 역할을 한다. 한가지 중요한 차이는 InnoDB 스토리지 엔진은 레코드 자체가 아니라 인덱스의 레코드를 잠근다는 점이다. 만약 인덱스가 하나도 없는 테이블이라 하더라도 내부적으로 자동 생성된 클러스터 인덱스를 이용해 잠금을 설정한다.</p>
+<ul>
+<li>갭 락(Gap lock)</li>
+</ul>
+<p>다른 DBMS와의 또 다른 차이는 바로 갭 락이다. 갭 락은 레코드 그 자체가 아니라 레코드와 바로 인접한 레코드 사이의 간격만을 잠그는 것을 의미한다. 갭 락의 역할은 레코드와 레코드 사이에 새로운 레코드가 생성되는 것을 제어하는 것이다.</p>
+<ul>
+<li>넥스트 키 락(Next key lock)</li>
+</ul>
+<p>레코드 락과 갭 락을 합쳐 놓은 형태의 잠금을 넥스트 키 락이라고 한다. </p>
+<ul>
+<li>자동 증가 락(Auto increment lock)</li>
+</ul>
+<p>Auto_increment 칼럼이 사용된 테이블에 동시에 여러 레코드가 insert 되는 경우, 저장되는 각 레고드는 중복되지 않고 저장된 순서대로 증가한 일련번호 값을 가져야 한다. InnoDB 스토리지 엔진에서는 이를 위해 내부적으로 Auto_increment 락이라고 하는 테이블의 수준의 잠금을 사용한다.</p>
+<h3 id="4-4-3-인덱스와-잠금"><a href="#4-4-3-인덱스와-잠금" class="headerlink" title="4.4.3 인덱스와 잠금"></a>4.4.3 인덱스와 잠금</h3><p>InnoDB의 잠금과 인덱스는 상당히 중요한 연관 관계가 있다. 레코드 락은 레코드의 인덱스를 잠그는 방식으로 처리된다. 즉, 변경해야 할 레코드를 찾기 위해 검색한 인덱스의 레코드를 모두 잠가야 한다.</p>
+<p>하나의 테이블에 update 문장이 실행되면 Mysql의 InnoDB는 인덱스로 사용된 컬럼의 값과 동일한 레코드 들에 락을 건다. 만약 인덱스가 없다면 해당 테이블의 레코드에 모두 락을 건다.</p>
+<h3 id="4-4-4-트랜잭션-격리-수준과-잠금"><a href="#4-4-4-트랜잭션-격리-수준과-잠금" class="headerlink" title="4.4.4 트랜잭션 격리 수준과 잠금"></a>4.4.4 트랜잭션 격리 수준과 잠금</h3><p>이러한 불필요한 레코드의 잠금 현상은 InnoDB의 넥스트 키 락 때문에 발생하는 것이다. 하지만 InnoDB에서 넥스트 키 락을 필요하게 만드는 주 원인은 바로 복제를 위한 바이너리 로그 때문이다. 레코드 기반의 바이너리 로그를 사용하거나 바이너리 로그를 사용하지 않는 경우에는 InnoDB의 갭 락이나 넥스트 키 락의 사용을 대폭 줄일 수 있다.</p>
+<ul>
+<li><p>Mysql 5.0<br>innodb_locks_unsafe_for_binlog = 1<br><br>트랜잭션 격리수준을 READ-COMMIT 로 설정</p>
+</li>
+<li><p>Mysql 5.1 이상</p>
+</li>
+</ul>
+<ol>
+<li>바이너리 로그를 비활성화</li>
+<li>레코드 기반의 바이너리 로그 사용 : innodb_locks_unsafe_for_binlog = 1</li>
+</ol>
+<h3 id="4-4-5-레코드-수준의-잠금-확인-및-해제"><a href="#4-4-5-레코드-수준의-잠금-확인-및-해제" class="headerlink" title="4.4.5 레코드 수준의 잠금 확인 및 해제"></a>4.4.5 레코드 수준의 잠금 확인 및 해제</h3><p>InnoDB 스토리지 엔진을 사용하는 테이블의 레코드 수준 잠금은 테이블 수준의 잠금보다는 복잡하다.<br>(복잡해서 요약이 안됨)</p>
+<h2 id="4-5-Mysql의-격리-수준"><a href="#4-5-Mysql의-격리-수준" class="headerlink" title="4.5 Mysql의 격리 수준"></a>4.5 Mysql의 격리 수준</h2><p>트랜잭션의 격리 수준이란 동시에 여러 트랜잭션이 처리될 때, 득정 트랜잭션이 다른 트랜잭션에서 변경하거나 조회하는 데이터를 볼 수 있도록 허용할지 말지를 결정하는 것이다. 격리 수준은 크게 READ UNCOMMITED, READ COMMITED, REPEATABLE READ, SERIALIZABLE 의 4가지로 나뉜다.</p>
+<p>데이터베이스의 격리수준을 이야기 하면 항상 언급되는 것은 부정합이다. 3가지 부정합 문제가 있으며 각각의 격리수준에 따른 부정합 문제는 다음과 같다.</p>
+<table>
+<thead>
+<tr>
+<th>격리수준</th>
+<th>DIRTY READ</th>
+<th>NON-REPEATABLE READ</th>
+<th>PHANTOM READ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>READ UNCOMMITTED</td>
+<td>발생</td>
+<td>발생</td>
+<td>발생</td>
+</tr>
+<tr>
+<td>READ COMMITTED</td>
+<td>발생하지 않음</td>
+<td>발생</td>
+<td>발생</td>
+</tr>
+<tr>
+<td>REPEATABLE READ</td>
+<td>발생하지 않음</td>
+<td>발생하지 않음</td>
+<td>발생(InnoDB는 발생하지 않음)</td>
+</tr>
+<tr>
+<td>SERIALIZABLE</td>
+<td>발생하지 않음</td>
+<td>발생하지 않음</td>
+<td>발생하지 않음</td>
+</tr>
+</tbody>
+</table>
+<h3 id="4-5-1-READ-UNCOMMITTED"><a href="#4-5-1-READ-UNCOMMITTED" class="headerlink" title="4.5.1 READ UNCOMMITTED"></a>4.5.1 READ UNCOMMITTED</h3><p>READ UNCOMMITTED 격리 수준에서는 각 트랜잭션에서의 변경 내용이 COMMIT이나 ROLLBACK 여부에 상관 없이 다른 트랜잭션에서 보여진다.</p>
+</div><script type="text/javascript" src="/js/share.js?v=0.0.0" async></script><a data-url="https://jumpegg.github.io/2017/07/15/mysql-transection3/" data-id="cj54rc233000kssufhn7co8f6" class="article-share-link">Share</a><div class="tags"><a href="/tags/transection/">transection</a></div><div class="post-nav"><a href="/2017/07/13/ionic-problem-01/" class="next">ionic root nav 문제해결</a></div></div></div></div><div class="pure-u-1-4 hidden_mid_and_down"><div id="sidebar"><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> Categories</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Hexo/">Hexo</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Mysql/">Mysql</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ionic2/">ionic2</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/문제해결/">문제해결</a><span class="category-list-count">1</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> Tags</i></div><div class="tagcloud"><a href="/tags/ionic2-nav/" style="font-size: 15px;">ionic2-nav</a> <a href="/tags/Mysql/" style="font-size: 15px;">Mysql</a> <a href="/tags/ionic2-menu/" style="font-size: 15px;">ionic2-menu</a> <a href="/tags/ionic-root/" style="font-size: 15px;">ionic-root</a> <a href="/tags/transection/" style="font-size: 15px;">transection</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> Recent</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/07/15/mysql-transection3/">CH 4 트랜잭션(4.4)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/13/ionic-problem-01/">ionic root nav 문제해결</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/12/ionic-menu/">ionic-menu</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/12/mysql-transection2/">CH 4 트랜잭션(4.2, 4.3)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/12/mysql-transection1/">CH 4 트랜젝션(4.1)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/09/Ionic-nav-guard/">Ionic Guard 구현</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture4/">3. Mysql 아키텍처(3.7, 3.8)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture3/">3. Mysql 아키텍처(3.4, 3.5, 3.6)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture2/">3. Mysql 아키텍처(3.2, 3.3)</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/08/Mysql-architecture/">3. Mysql 아키텍쳐(3.1)</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> Links</i></div><ul></ul><a href="http://textshare.io" title="textshare.io" target="_blank">textshare.io</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2017 <a href="/." rel="nofollow">Wonny's note.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a id="rocket" href="#top" class="show"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.bootcss.com/fancybox/3.0.47/jquery.fancybox.min.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>

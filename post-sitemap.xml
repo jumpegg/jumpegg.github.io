@@ -7,6 +7,22 @@
     </url>
 
     <url>
+        <loc>https://jumpegg.github.io/2017/07/15/mysql-transection3/</loc>
+        <lastmod>2017-07-15T03:34:10.078Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://jumpegg.github.io/2017/07/12/mysql-transection2/</loc>
+        <lastmod>2017-07-15T01:30:21.615Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://jumpegg.github.io/2017/07/13/ionic-problem-01/</loc>
         <lastmod>2017-07-13T09:39:25.897Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -33,14 +49,6 @@
     <url>
         <loc>https://jumpegg.github.io/2017/07/07/ionic-nav/</loc>
         <lastmod>2017-07-12T08:59:28.348Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://jumpegg.github.io/2017/07/12/mysql-transection2/</loc>
-        <lastmod>2017-07-12T07:13:44.519Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
