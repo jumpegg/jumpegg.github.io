@@ -5,7 +5,7 @@
   <link href="/feed.xml" rel="self"/>
   
   <link href="https://jumpegg.github.io/"/>
-  <updated>2017-07-15T04:25:45.876Z</updated>
+  <updated>2017-07-18T09:36:30.640Z</updated>
   <id>https://jumpegg.github.io/</id>
   
   <author>
@@ -14,6 +14,95 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Javascript 패턴 - 객체 생성 패턴 2</title>
+    <link href="https://jumpegg.github.io/2017/07/18/pattern-object2/"/>
+    <id>https://jumpegg.github.io/2017/07/18/pattern-object2/</id>
+    <published>2017-07-18T09:26:22.000Z</published>
+    <updated>2017-07-18T09:36:30.640Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="5-3-비공개-프로퍼티와-메서드"><a href="#5-3-비공개-프로퍼티와-메서드" class="headerlink" title="5.3 비공개 프로퍼티와 메서드"></a>5.3 비공개 프로퍼티와 메서드</h2><p>자바 등 다른 언어와는 달리 자바스크립트에는 private, protected, public 프로퍼티와 메서드를 나타내는 별도의 문법이 없다. 객체의 모든 멤버는 public, 즉 공개되어 있다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myobj = &#123;</div><div class="line">	<span class="attr">myprop</span>: <span class="number">1</span>,</div><div class="line">	<span class="attr">getProp</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		<span class="keyword">return</span> <span class="keyword">this</span>.myprop;</div><div class="line">	&#125;</div><div class="line">&#125;</div><div class="line"><span class="built_in">console</span>.log(myobj.myprop); <span class="comment">// 'myprop'에 공개적으로 접근할 수 있다.</span></div><div class="line"><span class="built_in">console</span>.log(myobj.getProp()); <span class="comment">// getProp() 역시 공개되어 있다.</span></div></pre></td></tr></table></figure>
+<h4 id="비공개-private-멤버"><a href="#비공개-private-멤버" class="headerlink" title="비공개(private) 멤버"></a>비공개(private) 멤버</h4><p>비공개 멤버에 대한 별도의 문법은 없지만 클로저를 사용해서 구현할 수 있다. 생성자 함수 안에서 클로저를 만들면, 클로저 유효범위 안의 변수는 생성자 함수 외부에 노출되지 않지만 객체의 공개 메서드 안에서는 쓸 수 있다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Gadget</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="comment">// 비공개 멤버</span></div><div class="line">	<span class="keyword">var</span> name = <span class="string">'iPod'</span>;</div><div class="line">	<span class="comment">// 공개된 함수</span></div><div class="line">	<span class="keyword">this</span>.getName = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">		<span class="keyword">return</span> name;</div><div class="line">	&#125;;</div><div class="line">&#125;</div><div class="line"><span class="keyword">var</span> toy = <span class="keyword">new</span> Gadget();</div><div class="line"></div><div class="line"><span class="comment">// 'name'은 비공개이므로 undefined가 출력된다.</span></div><div class="line"><span class="built_in">console</span>.log(toy.name); <span class="comment">// undefined</span></div><div class="line"></div><div class="line"><span class="comment">// 공개 메서드에서는 'name'에 접근할 수 있다.</span></div><div class="line"><span class="built_in">console</span>.log(toy.getName());</div></pre></td></tr></table></figure>
+<h4 id="특권-메서드"><a href="#특권-메서드" class="headerlink" title="특권 메서드"></a>특권 메서드</h4><p>특권 메서드는 비공개 멤버를 외부에서 접근 가능하게 하는 메서드를 말한다. 위에서는 getName()에 해당한다.</p>
+<h4 id="비공개-멤버의-허점"><a href="#비공개-멤버의-허점" class="headerlink" title="비공개 멤버의 허점"></a>비공개 멤버의 허점</h4><p>비공개 멤버를 유지하는게 관건이라면, 다음과 같은 경우에 대해서 신경을 써야 한다.</p>
+<ul>
+<li><p>파이어폭스의 초기 버전 중 일부는 eval() 함수에 두 번째 매개변수를 전달 할 수 있게 되어있다. 이 매개변수는 함수의 비공개 유효범위를 들여다볼 수 있게 해주는 컨텍스트 객체다. 모질라 라이노(Rhino)의 parent 프로퍼티도 이와 비슷한 방식으로 비공개 유효범위에 접근할 수 있게 해준다. 현재 널리 사용되는 브라우저에는 적용되지 않는 사례들이다.</p>
+</li>
+<li><p>특권 메서드에서 비공개 변수의 값을 바로 반환할 경우 이 변수가 객체나 배열이라면 값이 아닌 참조가 반환되기 때문에, 외부 코드에서 비공개 변수값을 수정할 수 있다.</p>
+</li>
+</ul>
+<p>비공개 멤버에 대한 접근<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">Gadget</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="comment">// 비공개 멤버</span></div><div class="line">	<span class="keyword">var</span> specs = &#123;</div><div class="line">		<span class="attr">screen_width</span>: <span class="number">320</span>,</div><div class="line">		<span class="attr">screen_height</span>: <span class="number">480</span>,</div><div class="line">		<span class="attr">color</span>: <span class="string">"white"</span></div><div class="line">	&#125;;</div><div class="line">	<span class="comment">// 공개 함수</span></div><div class="line">	<span class="keyword">this</span>.getSpecs = <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">		<span class="keyword">return</span> specs;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure></p>
+<p>여기서 getSpec() 메서드가 specs 객체에 대한 참조를 반환하는게 문제다. 의도적으로 감춘 specs를 참조를 통해 외부에서 변경이 가능해지게 된 것이다. 의도대로라면 setSpec()메서드를 통해서만 값을 변경 가능하게 작동해야 한다.</p>
+<p>이를 해결하기 위해서는 getSpec() 에 객체를 복사해서 반환하는 방식으로 구현을 하면 된다. 이를 ‘최소 권한의 원칙(Principle of Least Authority, POLA)’ 이라고도 한다. </p>
+<h4 id="객체-리터럴과-비공개-멤버"><a href="#객체-리터럴과-비공개-멤버" class="headerlink" title="객체 리터럴과 비공개 멤버"></a>객체 리터럴과 비공개 멤버</h4><p>지금까지는 비공개 멤버를 만드는데 생성자를 사용했다. 그렇다면 객체 리터럴로 만들어진 객체는 비공개 멤버를 구현할 수 있을까? 객체 리터럴에서는 <strong>익명 즉시 실행함수</strong> 를 추가하여 클로저를 만든다. 다음 예제를 보자.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myobj;</div><div class="line">(<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="comment">// 비공개 멤버</span></div><div class="line">	<span class="keyword">var</span> name = <span class="string">"my, oh my"</span>;</div><div class="line"></div><div class="line">	<span class="comment">// 공개될 부분을 구현한다.</span></div><div class="line">	<span class="comment">// var를 사용하지 않았다는데 주의하라.</span></div><div class="line">	myobj = &#123;</div><div class="line">		<span class="comment">// 특권 메서드</span></div><div class="line">		getName: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">			<span class="keyword">return</span> name;</div><div class="line">		&#125;</div><div class="line">	&#125;;</div><div class="line">&#125;());</div><div class="line">myobj.getName(); <span class="comment">// "my, oh my"</span></div></pre></td></tr></table></figure>
+<p>다음 예제는 기본 개념은 동일하지만 약간 다르게 구현되어 있다. 앞으로 나올 ‘모듈 패턴’의 기초가 되는 예제이다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myobj = (<span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">	<span class="comment">// 비공개 멤버</span></div><div class="line">	<span class="keyword">var</span> name = <span class="string">"my, oh my"</span>;</div><div class="line"></div><div class="line">	<span class="comment">// 공개될 부분을 구현한다.</span></div><div class="line">	<span class="keyword">return</span> &#123;</div><div class="line">		<span class="attr">getName</span>: <span class="function"><span class="keyword">function</span>(<span class="params"></span>)</span>&#123;</div><div class="line">			<span class="keyword">return</span> name;</div><div class="line">		&#125;</div><div class="line">	&#125;;</div><div class="line">&#125;());</div><div class="line"></div><div class="line">myobj.getName(); <span class="comment">// "my, oh my"</span></div></pre></td></tr></table></figure>
+<h4 id="프로토타입과-비공개-멤버"><a href="#프로토타입과-비공개-멤버" class="headerlink" title="프로토타입과 비공개 멤버"></a>프로토타입과 비공개 멤버</h4><p>생성자를 사용하여 비공개 멤버를 만들 경우, 생성자를 호출하여 새로운 객체를 만들 때마다 비공개 멤버가 매번 재생성된다는 단점이 있다.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;5-3-비공개-프로퍼티와-메서드&quot;&gt;&lt;a href=&quot;#5-3-비공개-프로퍼티와-메서드&quot; class=&quot;headerlink&quot; title=&quot;5.3 비공개 프로퍼티와 메서드&quot;&gt;&lt;/a&gt;5.3 비공개 프로퍼티와 메서드&lt;/h2&gt;&lt;p&gt;자바 등 다른 언어
+    
+    </summary>
+    
+      <category term="Javascript Pattern" scheme="https://jumpegg.github.io/categories/Javascript-Pattern/"/>
+    
+    
+      <category term="pattern" scheme="https://jumpegg.github.io/tags/pattern/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Javascript 패턴 - 객체 생성 패턴 1</title>
+    <link href="https://jumpegg.github.io/2017/07/18/pattern-object1/"/>
+    <id>https://jumpegg.github.io/2017/07/18/pattern-object1/</id>
+    <published>2017-07-18T07:48:25.000Z</published>
+    <updated>2017-07-18T09:27:13.070Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="5-1-네임스페이스-패턴"><a href="#5-1-네임스페이스-패턴" class="headerlink" title="5.1 네임스페이스 패턴"></a>5.1 네임스페이스 패턴</h2><h4 id="네임스페이스-패턴"><a href="#네임스페이스-패턴" class="headerlink" title="네임스페이스 패턴"></a>네임스페이스 패턴</h4><p>네임스페이스는 프로그램에서 필요로 하는 전역 변수의 개수를 줄이는 동시에 과도한 접두어를 사용하지 않고도 이름이 겹치지 않게 해준다. 이러한 네임스페이스 패턴은 자바스크립트 언어에 내장된 기능은 아니지만 어렵지 않게 구현할 수 있다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 전역 객체</span></div><div class="line"><span class="keyword">var</span> myApp = &#123;&#125;;</div><div class="line"></div><div class="line"><span class="comment">// 생성자</span></div><div class="line">myApp.parent = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;;</div><div class="line">myApp.child = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;&#125;;</div><div class="line"></div><div class="line"><span class="comment">// 변수</span></div><div class="line">myApp.some_var = <span class="number">1</span>;</div><div class="line"></div><div class="line"><span class="comment">// 객체 컨테이너</span></div><div class="line">myApp.modules = &#123;&#125;;</div><div class="line"></div><div class="line"><span class="comment">// 객체들을 컨테이너 안에 추가한다.</span></div><div class="line">myApp.modules.module1 = &#123;&#125;;</div><div class="line">myApp.modules.module1.data = &#123;<span class="attr">a</span> : <span class="number">1</span>, <span class="attr">b</span> : <span class="number">2</span>&#125;;</div><div class="line">myApp.modules.module2 = &#123;&#125;;</div></pre></td></tr></table></figure>
+<p>먼저 애플리케이션 전역 전용 객체 (위에선 myApp이 전역 전용 객체)를 생성한다. 그런 다음 모든 함수와 변수들을 이 전역 객체의 프로퍼티로 생성한다.</p>
+<p>이 패턴은 코드에 네임스페이스를 지정해주며, 코드 내의 이름 충돌 뿐 아니라 이 코드와 같은 페이지에 존재하는 자바스크립트 라이브러리나 위젯 등 서드 파티 코드와의 이름 충돌도 방지해준다.</p>
+<p>단점</p>
+<ul>
+<li>모든 변수와 함수에 접두어를 붙여야 하기 때문에 전체적으로 코드량이 약간 더 많아지고 따라서 다운로드해야 하는 파일 크기도 늘어난다.</li>
+<li>전역 인스턴스가 단 하나뿐이기 때문에 코드의 어느 한 부분이 수정되어도 전역 인스턴스를 수정하게 된다. 즉 나머지 기능들도 갱신된 상태를 물려받는다.</li>
+<li>이름이 중첩되고 길어지므로 프로퍼티를 판별하기 위한 검색 작업도 길고 느려진다. 이 장의 뒷부분에서는 이 단점을 해결하기 위한 방법으로는 샌드박스 패턴이 있다.</li>
+</ul>
+<h4 id="범용-네임스페이스-함수"><a href="#범용-네임스페이스-함수" class="headerlink" title="범용 네임스페이스 함수"></a>범용 네임스페이스 함수</h4><p>프로그램의 복잡도가 증가하고 코드의 각 부분들이 별개의 파일로 분리되어 선택적으로 문서에 포함되게 되면, 어떤 코드가 특정 네임스페이스나 그 내부의 프로퍼티를 처음으로 정의한다고 가정하기가 위험하다. 그러므로 네임스페이스를 생성하거나 프로퍼티를 추가하기 전에 먼저 이미 존재하는지 여부를 확인하는 것이 최선이다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 생성 이전에 존재여부 확인</span></div><div class="line"><span class="keyword">if</span>( <span class="keyword">typeof</span> myApp === <span class="string">"undefined"</span>)&#123;</div><div class="line">	<span class="keyword">var</span> myApp = &#123;&#125;;</div><div class="line">&#125;</div><div class="line"><span class="comment">// 간략히 줄임</span></div><div class="line"><span class="keyword">var</span> myApp = myApp || &#123;&#125;;</div></pre></td></tr></table></figure>
+<p>이런 확인작업의 추가는 상당량의 중복 코드를 발생시키므로 네임스페이스를 생성하는 재사용 가능한 함수를 만들어 두는편이 편하다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myApp = myApp || &#123;&#125;;</div><div class="line"></div><div class="line">myApp.namespace = <span class="function"><span class="keyword">function</span>(<span class="params">ns_string</span>)</span>&#123;</div><div class="line">	<span class="keyword">var</span> parts = ns_string.split(<span class="string">'.'</span>),</div><div class="line">	<span class="keyword">var</span> parent = myApp,</div><div class="line">	<span class="keyword">var</span> i;</div><div class="line">	</div><div class="line">	<span class="keyword">if</span> (parts[<span class="number">0</span>] === <span class="string">"myApp"</span>)&#123;</div><div class="line">		parts = parts.slice(<span class="number">1</span>);</div><div class="line">	&#125;</div><div class="line"></div><div class="line">	<span class="keyword">for</span>(i=<span class="number">0</span>; i&lt;parts.length; i+=<span class="number">1</span>)&#123;</div><div class="line">		<span class="keyword">if</span>(<span class="keyword">typeof</span> parent[parts[i]] === <span class="string">"undefined"</span>)&#123;</div><div class="line">			parent[parts[i]] = &#123;&#125;;</div><div class="line">		&#125;</div><div class="line">		parent = parent[parts[i]];</div><div class="line">	&#125;</div><div class="line">	<span class="keyword">return</span> parent;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>이 코드는 다음 모든 예에서 사용할 수 있다.<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// 반환 값을 지역변수에 할당한다.</span></div><div class="line"><span class="keyword">var</span> module2 = myApp.namespace(<span class="string">'myApp.modules.module2'</span>);</div><div class="line">module2 === myApp.modules.module2; <span class="comment">// true</span></div><div class="line"></div><div class="line"><span class="comment">// 첫 부분의 'myApp'을 생략하고도 쓸 수 있다.</span></div><div class="line">myApp.namespace(<span class="string">'modules.module51'</span>);</div><div class="line"></div><div class="line"><span class="comment">// 아주 긴 네임스페이스</span></div><div class="line">myApp.namespace(<span class="string">'once.upon.a.time.there.was.this.long.nested.property'</span>);</div></pre></td></tr></table></figure></p>
+<h2 id="5-2-의존-관계-선언"><a href="#5-2-의존-관계-선언" class="headerlink" title="5.2 의존 관계 선언"></a>5.2 의존 관계 선언</h2><p>자바스크립트 라이브러리들은 대개 네임스페이스를 지정하여 모듈화되어 있기 때문에, 필요한 모듈만 골라서 쓸 수 있다. 예를 들어 YUI2에는 네임스페이스 역할을 하는 YAHOO 라는 전역변수가 있다.</p>
+<p>이때 함수나 모듈 내 최상단에, 의존 관계에 있는 모듈을 선언하는 것이 좋다. 즉 지역변수를 만들어 원하는 모듈을 가리키도록 선언하는 것이다.</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> myFunction = <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</div><div class="line">	<span class="comment">// 의존관계에 있는 모듈들</span></div><div class="line">	<span class="keyword">var</span> event = YAHOO.util.Event,</div><div class="line">	<span class="keyword">var</span> dom = YAHOO.util.Dom;</div><div class="line"></div><div class="line">	<span class="comment">// 이제 event와 dom 이라는 변수를 사용한다....</span></div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<p>대단히 간단한 패턴이지만 상당히 많은 장점을 가지고 있다.</p>
+<ul>
+<li>의존 관계가 명시적으로 선언되어 있기 때문에 코드를 사용하는 사람이 페이지내에 반드시 포함시켜야 하는 스크립트 파일이 무엇인지 알 수 있다.</li>
+<li>함수의 첫머리에 의존 관계가 선언되기 때문에 의존 관계를 찾아내고 이해하기가 쉽다.</li>
+<li>dom과 같은 지역 변수는 YAHOO와 같은 전역 변수보다 언제나 더 빠르며 YAHOO.util.Dom 처럼 전역 변수의 중첩 프로퍼티와 비교하면 더 말할 것도 없다. 의존 관계 선언 패턴을 잘 지키면 함수 안에서 전역 객체 판별을 단 한번만 수행하고, 이 다음부터는 지역 변수를 사용하기 때문에 훨씬 빠르다.</li>
+<li>YUI 컴프레서나 구글 클로저 등 고급 압축 도구는 지역 변수명에 대해서는 event를 A 라는 글자 하나로 바꾸는 식으로 축약해 코드를 줄여준다. 하지만 전역 변수명 변경은 위험하기 때문에 축약하지 않는다.</li>
+</ul>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;5-1-네임스페이스-패턴&quot;&gt;&lt;a href=&quot;#5-1-네임스페이스-패턴&quot; class=&quot;headerlink&quot; title=&quot;5.1 네임스페이스 패턴&quot;&gt;&lt;/a&gt;5.1 네임스페이스 패턴&lt;/h2&gt;&lt;h4 id=&quot;네임스페이스-패턴&quot;&gt;&lt;a href=&quot;#
+    
+    </summary>
+    
+      <category term="Javascript Pattern" scheme="https://jumpegg.github.io/categories/Javascript-Pattern/"/>
+    
+    
+      <category term="pattern" scheme="https://jumpegg.github.io/tags/pattern/"/>
+    
+  </entry>
   
   <entry>
     <title>CH 4 트랜잭션(4.4, 4.5)</title>
