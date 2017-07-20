@@ -5,7 +5,7 @@
   <link href="/feed.xml" rel="self"/>
   
   <link href="https://jumpegg.github.io/"/>
-  <updated>2017-07-20T05:44:10.809Z</updated>
+  <updated>2017-07-20T05:48:45.312Z</updated>
   <id>https://jumpegg.github.io/</id>
   
   <author>
@@ -16,11 +16,11 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>angular2-problem-01</title>
+    <title>nginx 파일업로드 문제</title>
     <link href="https://jumpegg.github.io/2017/07/20/angular2-problem-01/"/>
     <id>https://jumpegg.github.io/2017/07/20/angular2-problem-01/</id>
     <published>2017-07-20T05:34:59.000Z</published>
-    <updated>2017-07-20T05:44:10.809Z</updated>
+    <updated>2017-07-20T05:48:45.312Z</updated>
     
     <content type="html"><![CDATA[<h3 id="nginx-파일업로드-제한-문제"><a href="#nginx-파일업로드-제한-문제" class="headerlink" title="nginx 파일업로드 제한 문제"></a>nginx 파일업로드 제한 문제</h3><p>Angular로 개인 프로젝트로 만든 사이트중 파일 업로드 부분에서 문제가 발생했었다.</p>
 <h4 id="문제인식"><a href="#문제인식" class="headerlink" title="문제인식"></a>문제인식</h4><p>부끄럽게도 면접보러 간 자리에서 파일 업로드에 문제가 발생한것을 발견했다. 그 당시에 확인한 오류 메세지와 혼자 고치면서 보게된 메세지가 달라서 이후에 다른 문제점을 발견할 수도 있는데 일단 지금 확인된 버그부터 수정했다.</p>
