@@ -7,6 +7,22 @@
     </url>
 
     <url>
+        <loc>https://jumpegg.github.io/2017/07/12/ionic-menu/</loc>
+        <lastmod>2017-07-20T05:46:59.497Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://jumpegg.github.io/2017/07/20/angular2-problem-01/</loc>
+        <lastmod>2017-07-20T05:44:10.809Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://jumpegg.github.io/2017/07/18/pattern-object2/</loc>
         <lastmod>2017-07-18T09:36:30.640Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -41,14 +57,6 @@
     <url>
         <loc>https://jumpegg.github.io/2017/07/13/ionic-problem-01/</loc>
         <lastmod>2017-07-13T09:39:25.897Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.6</priority>
-
-    </url>
-
-    <url>
-        <loc>https://jumpegg.github.io/2017/07/12/ionic-menu/</loc>
-        <lastmod>2017-07-12T09:12:08.989Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.6</priority>
 
