@@ -5,7 +5,7 @@
   <link href="/feed.xml" rel="self"/>
   
   <link href="https://jumpegg.github.io/"/>
-  <updated>2017-07-20T07:56:27.638Z</updated>
+  <updated>2017-07-21T08:33:14.436Z</updated>
   <id>https://jumpegg.github.io/</id>
   
   <author>
@@ -14,6 +14,61 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>CH 5 인덱스(5.1)</title>
+    <link href="https://jumpegg.github.io/2017/07/21/mysql-index1/"/>
+    <id>https://jumpegg.github.io/2017/07/21/mysql-index1/</id>
+    <published>2017-07-21T07:31:24.000Z</published>
+    <updated>2017-07-21T08:33:14.436Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="5-1-디스크-읽기-방식"><a href="#5-1-디스크-읽기-방식" class="headerlink" title="5.1 디스크 읽기 방식"></a>5.1 디스크 읽기 방식</h2><h3 id="5-1-1-저장-매체"><a href="#5-1-1-저장-매체" class="headerlink" title="5.1.1 저장 매체"></a>5.1.1 저장 매체</h3><p>일반적으로 서버에 사용되는 저장 매체는 크게 3가지로 나뉜다.</p>
+<ul>
+<li>내장 디스크(Internal Disk)</li>
+<li>DAS(Direct Attached Storage)</li>
+<li>NAS(Network Attached Storage)</li>
+<li>SAN(Storage Area Network)</li>
+</ul>
+<p>내장 디스크는 개인용 PC의 본체 내에 장착된 디스크와 같은 매체다. 이런 내장 디스크는 물리적으로 제한된 공간 때문에 장착할 수 있는 디스크의 개수가 적고 용량이 부족할 때가 많다. 내장 디스크의 용량 문제를 해결하기 위해 주로 사용하는 것이 DAS인데, DAS는 컴퓨터의 본체와는 달리 디스크만 있는 것이 특징이다. DAS는 하나의 컴퓨터 본체에 연결해서 사용하기 때문에 디스크의 정보를 여러 컴퓨터가 동시에 공유하는 것이 불가능하다.</p>
+<p>내장 디스크와 DAS의 문제점을 동시에 해결하기 위해 주로 NAS와 SAN을 사용한다. DAS는 내장디스크처럼 SATA나 SAS 또는 SCSI 케이블로 연결되지만, NAS는 TCP/IP를 통해 연결된다.</p>
+<p>SAN은 DAS로는 구축할 수 없는 아주 대용량의 스토리지 공간을 제공하는 장치다. SAN은 여러 컴퓨터에서 동시에 사용할 수 있을뿐더러 컴퓨터 본체와 광케이블로 연결되기 때문에 상당히 빠르고 안정적인 데이터 처리를 보장해준다.</p>
+<h3 id="5-1-2-디스크-드라이브와-솔리드-스테이트-드라이브"><a href="#5-1-2-디스크-드라이브와-솔리드-스테이트-드라이브" class="headerlink" title="5.1.2 디스크 드라이브와 솔리드 스테이트 드라이브"></a>5.1.2 디스크 드라이브와 솔리드 스테이트 드라이브</h3><p>컴퓨터에서 CPU나 메모리와 같은 주요 장치는 대부분 전자식 장치지만 디스크 드라이브는 기계식 장치다. 그래서 데이터베이스 서버에서는 항상 디스크 장치가 병목 지점이 된다. 이러한 단점을 대체하기 위해 전자식 저장 매체인 SSD가 많이 출시되고 있다. </p>
+<h3 id="5-1-3-랜덤-I-O-와-순차-I-O"><a href="#5-1-3-랜덤-I-O-와-순차-I-O" class="headerlink" title="5.1.3 랜덤 I/O 와 순차 I/O"></a>5.1.3 랜덤 I/O 와 순차 I/O</h3><p>랜덤 I/O라는 표현은 디스크 드라이브의 플래터(원판)을 돌려서 읽어야 할 데이터가 저장된 위치로 디스크 헤더를 이동시킨 다음 데이터를 읽는 것을 의미하는데, 사실 순차 I/O 또한 이 작업은 같다. 디스크에 데이터를 쓰고 읽는 데 걸리는 시간은 디스크 헤더를 움직여서 읽고 쓸 위치로 옮기는 단계에서 결정된다. 순차 I/O의 경우 랜덤 I/O 보다 빠르고, 이렇게 순차적으로 데이터를 처리하기 위해 Mysql서버에서는 작은 데이터의 읽고 쓰는 작업을 그룹 커밋이나 바이너리 로그 버퍼 또는 InnoDB 로그 버퍼 등의 기능이 내장되어 있다.</p>
+<h2 id="5-2-인덱스란"><a href="#5-2-인덱스란" class="headerlink" title="5.2 인덱스란?"></a>5.2 인덱스란?</h2><p>DBMS에서 데이터 테이블의 모든 데이터를 검색해서 원하는 결과를 가져오려면 시간이 오래걸린다. 그래서 칼럼의 값과 해당 레코드가 저장된 주소를 키와 값의 쌍(Key-Value)으로 인덱스를 만들어 둔다. 데이터를 찾을 때 국어사전처럼 “ㄱ”,”ㄴ” 같이 일정한 기준으로 인덱스를 나눠놓으면 데이터를 찾을 때 빨리 찾을 수 있다.</p>
+<p>인덱스의 또다른 특징을 프로그래밍 언어의 자료구조로 알아보자. 자료구조에는 SortedList 와 ArrayList 라는 자료구조가 있는데 SortedList는 DBMS의 인덱스와 같은 자료구조이며, ArrayList는 데이터 파일과 같은 자료구조를 사용한다. SortedList는 저장되는 값을 항상 정렬된 상태로 유지하는 자료구조이고, ArrayList는 값을 저장되는 순서대로 그대로 유지하는 자료구조다.</p>
+<p>SortedList는 데이터가 저장될 때마다 항상 값을 정렬해야 하므로 저장되는 과정이 복잡하고 느리지만, 값을 가져올때는 아주 빨리 가져올 수 있다.</p>
+<p>인덱스를 설정할 때 인덱스의 갯수만큼 insert, update, delete 작업이 느려지는데 이러한 저장속도의 희생 정도를 감안해서 인덱스를 만들어야한다.</p>
+<p>인덱스는 데이터를 관리하는 방식과 중복값의 허용 여부 등에 따라 여러 가지로 나눠볼 수 있다. 인덱스를 역할별로 구분해 본다면 프라이머리 키(Primary key)와 보조 키(Secondary key)로 구분해 볼 수 있다.</p>
+<ul>
+<li><p>프라이머리 키는 그 레코드를 대표하는 칼럼의 값으로 만들어진 인덱스를 의미한다. 이 칼럼은 테이블에서 해당 레코드를 식별할 수 있는 기준값이 되기 때문에 우리는 이를 식별자라고도 부른다.</p>
+</li>
+<li><p>위의 키를 제외한 모든 인덱스는 보조 인덱스(Secondary Index)로 분류한다. </p>
+</li>
+</ul>
+<p>데이터 저장 방식(알고리즘)별로 구분하는 것은 사실 상당히 많은 분류가 가능하겟지만 대표적으로 B-Tree 인덱스와 Hash 인덱스로 구분할 수 있다.</p>
+<ul>
+<li><p>B-Tree 알고리즘은 가장 일반적으로 사용되는 인덱스 알고리즘으로서, 상당히 오래전에 도입된 알고리즘이다. B-Tree인덱스는 칼럼의 값을 변경하지 않고, 원래의 값을 이용해 인덱싱 하는 알고리즘이다.</p>
+</li>
+<li><p>Hash 인덱스 알고리즘은 칼럼의 값으로 해시 값을 계산해서 인덱싱 하는 알고리즘으로, 매우 빠른 검색을 지원한다. 하지만 값을 변형해서 인덱싱하므로, prefix 일치와 같이 값의 일부만 검색하고자 할 때는 해시 인덱스를 사용할 수 없다. Hash 인덱스는 주로 메모리 기반 데이터베이스에서 많이 사용한다.</p>
+</li>
+<li><p>Fractal-Tree 알고리즘은 B-Tree의 단점을 보완하기 위해 고안되었다. 데이터가 저장되고 삭제될 때 처리비용을 줄일 수 있게 설계된것이 특징이다.</p>
+</li>
+</ul>
+<p>데이터의 중복 허용 여부로 분류하면 유니크 인덱스(Unique)와 유니크하지 않은 인덱스(Non-Unique)로 구분할 수 있다. 이 유니크 인덱스는 옵티마이저에게는 상당히 중요한 문제가 된다. 옵티마이저에서 유니크 인덱스에 대해 동등 조건(Equal, =) 으로 검색한다는 것은 항상 1건의 레코드만 찾으면 더 찾지 않아도 된다는 것을 의미한다.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;5-1-디스크-읽기-방식&quot;&gt;&lt;a href=&quot;#5-1-디스크-읽기-방식&quot; class=&quot;headerlink&quot; title=&quot;5.1 디스크 읽기 방식&quot;&gt;&lt;/a&gt;5.1 디스크 읽기 방식&lt;/h2&gt;&lt;h3 id=&quot;5-1-1-저장-매체&quot;&gt;&lt;a href=
+    
+    </summary>
+    
+      <category term="Mysql" scheme="https://jumpegg.github.io/categories/Mysql/"/>
+    
+    
+      <category term="index" scheme="https://jumpegg.github.io/tags/index/"/>
+    
+  </entry>
   
   <entry>
     <title>Javascript 패턴 - 객체 생성 패턴 3</title>
