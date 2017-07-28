@@ -161,6 +161,7 @@ div {
   color: #888; }
 
 .post {
+  padding: 25px;
   border-left: 3px solid #DDDDDD;
   margin-bottom: 20px; }
   .post .post-title {
