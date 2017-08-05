@@ -7,6 +7,22 @@
     </url>
 
     <url>
+        <loc>https://jumpegg.github.io/2017/08/05/problem03/</loc>
+        <lastmod>2017-08-05T06:43:20.800Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
+        <loc>https://jumpegg.github.io/2017/08/05/mysql-explain1/</loc>
+        <lastmod>2017-08-05T06:16:29.108Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.6</priority>
+
+    </url>
+
+    <url>
         <loc>https://jumpegg.github.io/2017/07/23/mysql-index4/</loc>
         <lastmod>2017-07-29T14:52:48.399Z</lastmod>
         <changefreq>weekly</changefreq>

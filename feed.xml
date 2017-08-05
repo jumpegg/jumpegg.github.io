@@ -5,7 +5,7 @@
   <link href="/feed.xml" rel="self"/>
   
   <link href="https://jumpegg.github.io/"/>
-  <updated>2017-07-25T06:42:05.683Z</updated>
+  <updated>2017-08-05T06:43:20.800Z</updated>
   <id>https://jumpegg.github.io/</id>
   
   <author>
@@ -14,6 +14,73 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>angular2 ngFor 문제해결</title>
+    <link href="https://jumpegg.github.io/2017/08/05/problem03/"/>
+    <id>https://jumpegg.github.io/2017/08/05/problem03/</id>
+    <published>2017-08-05T06:17:37.000Z</published>
+    <updated>2017-08-05T06:43:20.800Z</updated>
+    
+    <content type="html"><![CDATA[<h4 id="문제-인식"><a href="#문제-인식" class="headerlink" title="문제 인식"></a>문제 인식</h4><p>Daum api 를 사용하여 주소검색 엔진을 사용했었고, 검색된 결과를 list로 뿌려주는 작업을 했었다. 검색된 결과를 list로 보여주는 작업에 ngFor를 사용했는데, 검색된 결과가 바로 보여지지 않고 다른 작업을 하면 뒤늦게 반영되는 현상을 볼 수 있었다.</p>
+<h4 id="원인"><a href="#원인" class="headerlink" title="원인"></a>원인</h4><p>ngFor에 연동되는 Array<object> 가 변동되었는데 angular가 인식하지 못했다.</object></p>
+<h4 id="해결"><a href="#해결" class="headerlink" title="해결"></a>해결</h4><p>Daum api의 키워드 검색을 사용하면 검색된 결과를 callback 안에서 사용하는데 angular에서 변화를 인식하지 못했기 때문에 바로 ngFor에 반영이 되지 않음</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">searchAddress(keyword) &#123;</div><div class="line">		<span class="keyword">this</span>.placeResults = [];</div><div class="line">		<span class="keyword">let</span> obj = <span class="keyword">this</span>;</div><div class="line">    <span class="keyword">if</span>(keyword != <span class="string">""</span>) &#123;</div><div class="line">			<span class="keyword">this</span>.placesService.keywordSearch(keyword, <span class="function"><span class="keyword">function</span>(<span class="params">status, result</span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (status === daum.maps.services.Status.OK) &#123;</div><div class="line">					<span class="comment">// 데이터를 placeResults에 넣었지만 화면에는 반영이 안되었다.</span></div><div class="line">					obj.placeResults = result.places;</div><div class="line">        &#125;</div><div class="line">			&#125;);</div><div class="line">		&#125;</div><div class="line">	&#125;</div></pre></td></tr></table></figure>
+<p>이러한 변화감지를 강제적으로 걸어주기 위해 angular에서는 NgZone을 제공하고 있다. NgZone은 <strong>@angular/core</strong> 에 있다.</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// NgZone을 import 하자</span></div><div class="line"><span class="keyword">import</span> &#123;Component, ..... , NgZone&#125; <span class="keyword">from</span> <span class="string">'@angular/core'</span>;</div></pre></td></tr></table></figure>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div></pre></td><td class="code"><pre><div class="line"><span class="comment">// NgZone을 import 하자</span></div><div class="line"><span class="keyword">import</span> &#123;Component, ..... , NgZone&#125; <span class="keyword">from</span> <span class="string">'@angular/core'</span>;</div><div class="line"></div><div class="line"><span class="meta">@Component</span>(&#123;</div><div class="line">  selector: <span class="string">'YourSelector'</span>,</div><div class="line">  template: <span class="string">'YourTemplete'</span></div><div class="line">&#125;)</div><div class="line"><span class="keyword">export</span> <span class="keyword">class</span> YourComponent &#123;</div><div class="line"></div><div class="line">	<span class="keyword">constructor</span>(<span class="params"><span class="keyword">public</span> zone:NgZone, <span class="comment">//NgZone을 선언해주자</span></span></div><div class="line">							...................) &#123;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">	<span class="comment">// do something</span></div><div class="line">	.............. </div><div class="line"></div><div class="line">  searchAddress(keyword) &#123;</div><div class="line">		<span class="keyword">this</span>.placeResults = [];</div><div class="line">		<span class="keyword">let</span> obj = <span class="keyword">this</span>;</div><div class="line">    <span class="keyword">if</span>(keyword != <span class="string">""</span>) &#123;</div><div class="line">			<span class="keyword">this</span>.placesService.keywordSearch(keyword, <span class="function"><span class="keyword">function</span>(<span class="params">status, result</span>) </span>&#123;</div><div class="line">        <span class="keyword">if</span> (status === daum.maps.services.Status.OK) &#123;</div><div class="line">					<span class="comment">// 요렇게 NgZone을 쓰면된다</span></div><div class="line">					obj.zone.run(<span class="function"><span class="params">()</span>=&gt;</span>&#123;</div><div class="line">						obj.placeResults = result.places;</div><div class="line">					&#125;)</div><div class="line">        &#125;</div><div class="line">			&#125;);</div><div class="line">		&#125;</div><div class="line">	&#125;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h4 id="정리"><a href="#정리" class="headerlink" title="정리"></a>정리</h4><p>angular에서는 몇몇 상황에서 detection이 벗어나는 상황에 사용하기 위해 NgZone을 제공하고 있으며, 감지범위를 벗어나는 경우에 사용할 수 있다.</p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h4 id=&quot;문제-인식&quot;&gt;&lt;a href=&quot;#문제-인식&quot; class=&quot;headerlink&quot; title=&quot;문제 인식&quot;&gt;&lt;/a&gt;문제 인식&lt;/h4&gt;&lt;p&gt;Daum api 를 사용하여 주소검색 엔진을 사용했었고, 검색된 결과를 list로 뿌려주는 작업을 했었다
+    
+    </summary>
+    
+      <category term="문제해결" scheme="https://jumpegg.github.io/categories/%EB%AC%B8%EC%A0%9C%ED%95%B4%EA%B2%B0/"/>
+    
+    
+      <category term="angular-model-detection" scheme="https://jumpegg.github.io/tags/angular-model-detection/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>CH 6 실행계획(6.1, 6.2)</title>
+    <link href="https://jumpegg.github.io/2017/08/05/mysql-explain1/"/>
+    <id>https://jumpegg.github.io/2017/08/05/mysql-explain1/</id>
+    <published>2017-08-05T05:17:20.000Z</published>
+    <updated>2017-08-05T06:16:29.108Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="6-1-개요"><a href="#6-1-개요" class="headerlink" title="6.1 개요"></a>6.1 개요</h2><h3 id="6-1-1-쿼리-실행-절차"><a href="#6-1-1-쿼리-실행-절차" class="headerlink" title="6.1.1 쿼리 실행 절차"></a>6.1.1 쿼리 실행 절차</h3><p>Mysql 서버에서 쿼리가 실행되는 과정은 크게 3가지로 나눌 수 있다.</p>
+<ol>
+<li>사용자로부터 요청된 sql 문장을 잘게 쪼개서 Mysql 서버가 이해할 수 있는 수준으로 분리한다.</li>
+<li>sql의 파싱 정보를 확인하면서 어떤 테이블부터 읽고 어떤 인덱스를 이용해 테이블을 읽을지 선택한다.</li>
+<li>두 번째 단계에서 결정된 테이블의 읽기 순서나 선택된 인덱스를 이용해 스토리지 엔진으로 부터 데이터를 가져온다.</li>
+</ol>
+<p>첫번째 단계를 <strong>sql 파싱</strong> 이라고 하며, Mysql 서버의 <strong>sql 파서</strong> 라는 모듈로 처리한다. 만약 문법이 잘못되었다면 이 단계에서 걸러진다. 또한 이 단계에서 <strong>sql 파스 트리</strong> 가 만들어진다.</p>
+<p>두번째 단계는 <strong>sql 파스 트리</strong> 를 참조하면서 다음과 같은 내용을 처리한다.</p>
+<ul>
+<li>불필요한 조건의 제거 및 복잡한 연산의 단순화</li>
+<li>여러 테이블의 조인이 있는 경우 어떤 순서로 테이블을 읽을지 결정</li>
+<li>각 테이블에 사용된 조건과 인덱스 통계 정보를 이용해 사용할 인덱스 결정</li>
+<li>가져온 레코드들을 임시 테이블에 넣고 다시 한번 가공해야 하는지 결정</li>
+</ul>
+<p>두번째 단계에서는 <strong>최적화 및 실행 계획 수립</strong> 단계이며 Mysql 서버의 <strong>옵티마이저</strong> 에서 처리한다. </p>
+]]></content>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;6-1-개요&quot;&gt;&lt;a href=&quot;#6-1-개요&quot; class=&quot;headerlink&quot; title=&quot;6.1 개요&quot;&gt;&lt;/a&gt;6.1 개요&lt;/h2&gt;&lt;h3 id=&quot;6-1-1-쿼리-실행-절차&quot;&gt;&lt;a href=&quot;#6-1-1-쿼리-실행-절차&quot; class=&quot;
+    
+    </summary>
+    
+      <category term="Mysql" scheme="https://jumpegg.github.io/categories/Mysql/"/>
+    
+    
+      <category term="explain" scheme="https://jumpegg.github.io/tags/explain/"/>
+    
+  </entry>
   
   <entry>
     <title>CH 2 다양한 Nosql 데이터베이스(2.1, 2.2)</title>

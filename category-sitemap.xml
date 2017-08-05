@@ -21,13 +21,6 @@
     </url>
 
     <url>
-        <loc>https://jumpegg.github.io/categories/%EB%AC%B8%EC%A0%9C%ED%95%B4%EA%B2%B0/</loc>
-        <lastmod>2017-07-20T05:48:45.312Z</lastmod>
-        <changefreq>weekly</changefreq>
-        <priority>0.2</priority>
-    </url>
-
-    <url>
         <loc>https://jumpegg.github.io/categories/Javascript-Pattern/</loc>
         <lastmod>2017-07-20T07:56:27.638Z</lastmod>
         <changefreq>weekly</changefreq>
@@ -43,7 +36,14 @@
 
     <url>
         <loc>https://jumpegg.github.io/categories/Mysql/</loc>
-        <lastmod>2017-07-29T14:52:48.399Z</lastmod>
+        <lastmod>2017-08-05T06:16:29.108Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://jumpegg.github.io/categories/%EB%AC%B8%EC%A0%9C%ED%95%B4%EA%B2%B0/</loc>
+        <lastmod>2017-08-05T06:43:20.800Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
