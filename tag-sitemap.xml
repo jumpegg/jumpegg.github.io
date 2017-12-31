@@ -10,7 +10,7 @@
 
     <url>
         <loc>https://jumpegg.github.io/tags/ionic2-nav/</loc>
-        <lastmod>2017-07-12T08:59:34.949Z</lastmod>
+        <lastmod>2017-07-12T08:59:34.950Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
@@ -52,21 +52,21 @@
 
     <url>
         <loc>https://jumpegg.github.io/tags/index/</loc>
-        <lastmod>2017-07-29T14:52:48.399Z</lastmod>
+        <lastmod>2017-07-29T14:52:48.400Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://jumpegg.github.io/tags/angular-model-detection/</loc>
-        <lastmod>2017-08-05T06:43:20.800Z</lastmod>
+        <lastmod>2017-08-05T06:43:20.801Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
 
     <url>
         <loc>https://jumpegg.github.io/tags/WebAPI/</loc>
-        <lastmod>2017-08-09T12:44:18.772Z</lastmod>
+        <lastmod>2017-08-09T12:44:18.773Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
@@ -74,6 +74,13 @@
     <url>
         <loc>https://jumpegg.github.io/tags/explain/</loc>
         <lastmod>2017-08-09T12:56:27.716Z</lastmod>
+        <changefreq>weekly</changefreq>
+        <priority>0.2</priority>
+    </url>
+
+    <url>
+        <loc>https://jumpegg.github.io/tags/isotope/</loc>
+        <lastmod>2017-12-31T02:31:14.868Z</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.2</priority>
     </url>
