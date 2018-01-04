@@ -5,3 +5,7 @@
 @function vh($px){
   @return $px/1080*100vh;
 }
+
+@function rem($px){
+	@return $px/15*1rem;
+}
